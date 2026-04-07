@@ -11,7 +11,7 @@ enum RolesUsuario { ADMINISTRADOR, OPERARIO, CIUDADANO }
 enum TiposAcceso { CORREO_CONTRASEÑA, GOOGLE, CLAVE_ADMIN }
 
 @Data // Genera los Getters y Setters para mantener el código más limpio y ordenado
-public class Usuario {
+public class Usuario extends ModeloBase {
     
     // Identificadores y datos de contacto del perfil
     protected String idUsuario;          // Identificador único del registro
@@ -36,5 +36,32 @@ public class Usuario {
     protected Timestamp fechaEliminacion; 
     
     // Registro histórico de las comunicaciones enviadas al usuario
-    protected List<Notificacion> notificacionesRecibidas; 
+    protected List<Notificacion> notificacionesRecibidas;
+
+	public Usuario(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
+			String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
+			TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion,
+			Timestamp fechaEliminacion, List<Notificacion> notificacionesRecibidas) {
+		super(estado);
+		this.idUsuario = idUsuario;
+		this.nombre = nombre;
+		this.apellidos = apellidos;
+		this.correoElectronico = correoElectronico;
+		this.clave = clave;
+		this.fechaNacimiento = fechaNacimiento;
+		this.rolUsuario = rolUsuario;
+		this.fotoPerfilUrl = fotoPerfilUrl;
+		this.tipoAcceso = tipoAcceso;
+		this.bloqueado = bloqueado;
+		this.recibirNotificaciones = recibirNotificaciones;
+		this.fechaCreacion = fechaCreacion;
+		this.fechaEliminacion = fechaEliminacion;
+		this.notificacionesRecibidas = notificacionesRecibidas;
+	}
+
+	public Usuario(Estados estado) {
+		super(estado);
+	} 
+    
+    
 }

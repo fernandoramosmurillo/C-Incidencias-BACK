@@ -4,7 +4,7 @@ import com.google.cloud.Timestamp;
 import lombok.Data;
 
 @Data // Getters y Setters automáticos para un código más limpio y profesional
-public class Noticia {
+public class Noticia extends ModeloBase {
 
     private String idNoticia;       // El identificador único del artículo
     private String titulo;          // Titular principal de la noticia
@@ -19,4 +19,26 @@ public class Noticia {
     
     private String idAutor;         // El ID del Administrador que redactó la noticia
     private Boolean esDestacada;    // Si aparece la primera o con un diseño especial en la app
+    
+	public Noticia(Estados estado, String idNoticia, String titulo, String entradilla, String contenido,
+			String urlImagenPortada, String categoria, Timestamp fechaPublicacion, String idAutor,
+			Boolean esDestacada) {
+		super(estado);
+		this.idNoticia = idNoticia;
+		this.titulo = titulo;
+		this.entradilla = entradilla;
+		this.contenido = contenido;
+		this.urlImagenPortada = urlImagenPortada;
+		this.categoria = categoria;
+		this.fechaPublicacion = fechaPublicacion;
+		this.idAutor = idAutor;
+		this.esDestacada = esDestacada;
+	}
+
+	public Noticia(Estados estado) {
+		super(estado);
+	}
+    
+	
+    
 }

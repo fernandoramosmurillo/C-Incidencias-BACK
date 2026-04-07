@@ -1,6 +1,9 @@
 package com.cIncidencias.api.modelos;
 
 import java.util.List;
+
+import com.google.cloud.Timestamp;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,4 +19,33 @@ public class Ciudadano extends Usuario {
     // Historial de interacción con el sistema de incidencias
     private List<Incidencia> incidenciasSolicitadas; // Listado de quejas que ha abierto el ciudadano
     private List<Incidencia> incidenciasCalificadas; // Listado de incidencias en las que el usuario ha dejado valoración
+    
+	public Ciudadano(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
+			String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
+			TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion,
+			Timestamp fechaEliminacion, List<Notificacion> notificacionesRecibidas, String dni,
+			Integer telefonoContacto, String direccion, List<Incidencia> incidenciasSolicitadas,
+			List<Incidencia> incidenciasCalificadas) {
+		super(estado, idUsuario, nombre, apellidos, correoElectronico, clave, fechaNacimiento, rolUsuario,
+				fotoPerfilUrl, tipoAcceso, bloqueado, recibirNotificaciones, fechaCreacion, fechaEliminacion,
+				notificacionesRecibidas);
+		this.dni = dni;
+		this.telefonoContacto = telefonoContacto;
+		this.direccion = direccion;
+		this.incidenciasSolicitadas = incidenciasSolicitadas;
+		this.incidenciasCalificadas = incidenciasCalificadas;
+	}
+
+	public Ciudadano(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
+			String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
+			TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion,
+			Timestamp fechaEliminacion, List<Notificacion> notificacionesRecibidas) {
+		super(estado, idUsuario, nombre, apellidos, correoElectronico, clave, fechaNacimiento, rolUsuario,
+				fotoPerfilUrl, tipoAcceso, bloqueado, recibirNotificaciones, fechaCreacion, fechaEliminacion,
+				notificacionesRecibidas);
+	}
+    
+	
+	
+    
 }

@@ -1,5 +1,6 @@
 package com.cIncidencias.api.repositorios;
 
+import com.cIncidencias.api.Ficheros.ManejadorFicheros;
 import com.cIncidencias.api.modelos.Usuario;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
@@ -9,54 +10,117 @@ import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
 import org.springframework.stereotype.Repository;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Esta clase es el "puente" entre las clase de java y firebase
- * 
- * Se crea la conexion cuanto al documento y coleccion que pertenece a los usuarios
+ * Esta clase es el "puente" entre las clase de java y firebase * Se crea la
+ * conexion cuanto al documento y coleccion que pertenece a los usuarios
  */
 @Repository
 public class UsuarioRepository {
 
-    private final Firestore firestore;
+	private File archivoLog = new File("logs");
+	private final Firestore firestore;
 
-    // Spring inyecta automáticamente la conexión configurada en FirebaseConfig
-    public UsuarioRepository(Firestore firestore) {
-        this.firestore = firestore;
-    }
+	// Spring inyecta automáticamente la conexión configurada en FirebaseConfig
+	public UsuarioRepository(Firestore firestore) {
+		this.firestore = firestore;
+	}
 
-    public String guardarUsuario(Usuario usuario) throws ExecutionException, InterruptedException {
-    	
-        // Creamos el documento (filas y tabla), si ya existe, entramos en el
-    	DocumentReference docRef = firestore.collection("usuarios").document(usuario.getIdUsuario());
-        
-        ApiFuture<WriteResult> result = docRef.set(usuario);
-        
-        // Hacemos un log de la confirmación junto a la hora en la que se guardó en Google Cloud
-        return "Usuario"+usuario.getNombre()+ " "+usuar con éxito en Firestore. Fecha: " + result.get().getUpdateTime();
-    }
-    
-    public List<Usuario> obtenerUsuarios() throws InterruptedException, ExecutionException {
-    	ApiFuture<QuerySnapshot> query = firestore.collection("usuarios").get();
-    	QuerySnapshot querySnapshot = query.get();
-    	return querySnapshot.toObjects(Usuario.class);
-    }
-    
-    public Usuario obtenerUsuario(String idUsuario) throws InterruptedException, ExecutionException {
-    	DocumentReference docRef = firestore.collection("usuarios").document(idUsuario);
-    	ApiFuture<DocumentSnapshot> docSnapshot = docRef.get();
-    	return docSnapshot.get().toObject(Usuario.class);
-    }
-    
-    public void eliminarUsuario(String idUsuario) throws InterruptedException, ExecutionException {
-    	DocumentReference docRef = firestore.collection("usuarios").document(idUsuario);
-    	
-    	ApiFuture<WriteResult> result = docRef.delete();
-    	
-    }
-    
-    
-    
+	/**
+	 * Realiza la persistencia de un objeto Usuario en la base de datos Firestore.
+	 * * @param usuario El objeto usuario con los datos a guardar.
+	 * 
+	 * @throws ExecutionException   Si ocurre un error al ejecutar la operación
+	 *                              asíncrona.
+	 * @throws InterruptedException Si se interrumpe el hilo de ejecución.
+	 * @throws IOException
+	 */
+	public void guardarUsuario(Usuario usuario) throws ExecutionException, InterruptedException, IOException {
+
+		// Creamos el documento (filas y tabla), si ya existe, entramos en el
+		DocumentReference docRef = firestore.collection("usuarios").document(usuario.getIdUsuario());
+
+		ApiFuture<WriteResult> result = docRef.set(usuario);
+
+		// Aseguramos que la carpeta de logs existe antes de escribir
+		if (!archivoLog.exists()) {
+			archivoLog.mkdirs();
+		}
+
+		// Hacemos un log de la confirmación junto a la hora en la que se guardó en
+		// Google Cloud
+		ManejadorFicheros.escribir("logs/incidencias.log", "Usuario " + usuario.getNombre() + " "
+				+ usuario.getApellidos() + " guardado con éxito en Firestore. Fecha: " + result.get().getUpdateTime(),
+				true);
+	}
+
+	/**
+	 * Recupera la lista completa de documentos de la colección de usuarios.
+	 * * @return Una lista de objetos Usuario.
+	 * 
+	 * @throws InterruptedException Si la espera de los datos es interrumpida.
+	 * @throws ExecutionException   Si ocurre un error en la recuperación de los
+	 *                              datos.
+	 */
+	public List<Usuario> obtenerUsuarios() throws InterruptedException, ExecutionException {
+		ApiFuture<QuerySnapshot> query = firestore.collection("usuarios").get();
+		QuerySnapshot querySnapshot = query.get();
+		return querySnapshot.toObjects(Usuario.class);
+	}
+
+	/**
+	 * Busca y devuelve un usuario específico por su identificador. * @param
+	 * idUsuario El identificador único del documento.
+	 * 
+	 * @return El objeto Usuario encontrado.
+	 * @throws InterruptedException Si se interrumpe la conexión durante la
+	 *                              consulta.
+	 * @throws ExecutionException   Si hay un fallo en la ejecución de la consulta.
+	 */
+	public Usuario obtenerUsuario(String idUsuario) throws InterruptedException, ExecutionException {
+		DocumentReference docRef = firestore.collection("usuarios").document(idUsuario);
+		ApiFuture<DocumentSnapshot> docSnapshot = docRef.get();
+		return docSnapshot.get().toObject(Usuario.class);
+	}
+
+	/**
+	 * Elimina el documento de un usuario de la base de datos. * @param idUsuario El
+	 * ID del usuario que se desea borrar.
+	 * 
+	 * @throws InterruptedException Si la operación es interrumpida.
+	 * @throws ExecutionException   Si ocurre un error durante el proceso de
+	 *                              borrado.
+	 */
+	/**
+	 * Elimina el documento de un usuario de la base de datos y registra la acción
+	 * en el log local. * @param idUsuario El ID del usuario que se desea borrar.
+	 * 
+	 * @throws InterruptedException Si la operación es interrumpida durante la
+	 *                              espera del resultado.
+	 * @throws ExecutionException   Si ocurre un error en el proceso de borrado en
+	 *                              Firestore.
+	 * @throws IOException          Si ocurre un error al escribir en el archivo de
+	 *                              log.
+	 */
+	public void eliminarUsuario(String idUsuario) throws InterruptedException, ExecutionException, IOException {
+		DocumentReference docRef = firestore.collection("usuarios").document(idUsuario);
+		ApiFuture<WriteResult> result = docRef.delete();
+
+		// Esperamos a que la operación finalice en el servidor para obtener el
+		// resultado
+		WriteResult resultadoEscritura = result.get();
+
+		// Aseguramos que la carpeta de logs existe antes de escribir
+		if (!archivoLog.exists()) {
+			archivoLog.mkdirs();
+		}
+
+		// Registramos la eliminación en el log local
+		ManejadorFicheros.escribir("logs/incidencias.log", "Usuario con ID: " + idUsuario
+				+ " eliminado con éxito de Firestore. Fecha: " + resultadoEscritura.getUpdateTime(), true);
+	}
 }
