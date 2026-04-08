@@ -1,4 +1,4 @@
-package com.cIncidencias.api.Ficheros;
+package com.cIncidencias.api.ficheros;
 import java.io.*;
 
 public class ManejadorFicheros {

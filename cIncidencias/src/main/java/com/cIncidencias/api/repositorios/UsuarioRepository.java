@@ -1,6 +1,6 @@
 package com.cIncidencias.api.repositorios;
 
-import com.cIncidencias.api.Ficheros.ManejadorFicheros;
+import com.cIncidencias.api.ficheros.ManejadorFicheros;
 import com.cIncidencias.api.modelos.Usuario;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
@@ -55,7 +55,7 @@ public class UsuarioRepository {
 		// Google Cloud
 		ManejadorFicheros.escribir("logs/incidencias.log", "Usuario " + usuario.getNombre() + " "
 				+ usuario.getApellidos() + " guardado con éxito en Firestore. Fecha: " + result.get().getUpdateTime(),
-				true);
+				false);
 	}
 
 	/**
@@ -88,14 +88,6 @@ public class UsuarioRepository {
 	}
 
 	/**
-	 * Elimina el documento de un usuario de la base de datos. * @param idUsuario El
-	 * ID del usuario que se desea borrar.
-	 * 
-	 * @throws InterruptedException Si la operación es interrumpida.
-	 * @throws ExecutionException   Si ocurre un error durante el proceso de
-	 *                              borrado.
-	 */
-	/**
 	 * Elimina el documento de un usuario de la base de datos y registra la acción
 	 * en el log local. * @param idUsuario El ID del usuario que se desea borrar.
 	 * 
@@ -121,6 +113,32 @@ public class UsuarioRepository {
 
 		// Registramos la eliminación en el log local
 		ManejadorFicheros.escribir("logs/incidencias.log", "Usuario con ID: " + idUsuario
-				+ " eliminado con éxito de Firestore. Fecha: " + resultadoEscritura.getUpdateTime(), true);
+				+ " eliminado con éxito de Firestore. Fecha: " + resultadoEscritura.getUpdateTime(), false);
 	}
+
+	/**
+	 * Actualiza los datos de un usuario existente en Firestore.
+	 * 
+	 * @param usuario El objeto usuario con los datos actualizados.
+	 * @throws ExecutionException   Si hay un error en la tarea asíncrona.
+	 * @throws InterruptedException Si se interrumpe la conexión.
+	 * @throws IOException          Si falla el registro en el log local.
+	 */
+	public void modificarUsuario(Usuario usuario) throws ExecutionException, InterruptedException, IOException {
+		// Al usar set(), Firestore busca el documento por ID.
+		// Si existe, lo actualiza; si no, lo crea (aunque aquí asumimos que ya existe).
+		DocumentReference docRef = firestore.collection("usuarios").document(usuario.getIdUsuario());
+
+		ApiFuture<WriteResult> result = docRef.set(usuario);
+
+		// Esperamos el resultado para obtener la fecha de actualización de Google
+		String fechaActualizacion = result.get().getUpdateTime().toString();
+
+		ManejadorFicheros.escribir("logs/incidencias.log","Usuario ID: " + usuario.getIdUsuario() + " [" + usuario.getNombre()
+				+ "] modificado correctamente. Fecha: " + fechaActualizacion,false);
+	}
+
+	
+	
+	
 }
