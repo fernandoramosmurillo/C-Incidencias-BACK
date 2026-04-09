@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
 public class Incidencia extends ModeloBase {
     
     /** Estados que definen el ciclo de vida de resolución de una incidencia. */
-    public enum EstadosIncidencia { ABIERTA, ASIGNADA, EN_PROCESO, SOLUCIONADA, RECHAZADA }
+    public enum EstadosIncidencia { ABIERTA, ASIGNADA, PENDIENTE, SOLUCIONADA, RECHAZADA }
     
     /** Niveles de urgencia para la atención de la incidencia. */
     public enum Prioridades { MINIMO, BAJA, MEDIA, ALTA, MUY_ALTA, URGENTE }

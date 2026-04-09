@@ -1,6 +1,7 @@
 package com.cIncidencias.api.servicios;
 
 import com.cIncidencias.api.modelos.Incidencia;
+import com.cIncidencias.api.modelos.Incidencia.EstadosIncidencia;
 import com.cIncidencias.api.repositorios.IncidenciaRepository;
 import com.cIncidencias.api.excepciones.NullParamsException;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ public class IncidenciaService implements IGenericoService<Incidencia> {
 
 		// Lógica de negocio: establecer estado inicial si viene vacío
 		if (incidencia.getEstado() == null || incidencia.getEstadoIncidencia().toString().isEmpty()) {
-			incidencia.setEstadoIncidencia("PENDIENTE");
+			incidencia.setEstadoIncidencia(EstadosIncidencia.PENDIENTE);
 		}
 		
 		incidenciaRepository.guardar(incidencia);

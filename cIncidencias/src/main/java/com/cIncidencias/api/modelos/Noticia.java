@@ -9,7 +9,7 @@ public class Noticia extends ModeloBase {
     private String idNoticia;       // El identificador único del artículo
     private String titulo;          // Titular principal de la noticia
     private String entradilla;      // Un pequeño resumen para enganchar al lector
-    private String contenido;       // El cuerpo completo de la noticia (admite Markdown)
+    private String cuerpo;       // El cuerpo completo de la noticia (admite Markdown)
     
     private String urlImagenPortada; // El link a la foto principal en la nube
     private String categoria;       // Ej: "Avisos", "Eventos", "Cortes de tráfico"
@@ -27,7 +27,7 @@ public class Noticia extends ModeloBase {
 		this.idNoticia = idNoticia;
 		this.titulo = titulo;
 		this.entradilla = entradilla;
-		this.contenido = contenido;
+		this.cuerpo = contenido;
 		this.urlImagenPortada = urlImagenPortada;
 		this.categoria = categoria;
 		this.fechaPublicacion = fechaPublicacion;
