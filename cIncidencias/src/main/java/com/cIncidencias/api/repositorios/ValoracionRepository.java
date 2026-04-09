@@ -17,25 +17,22 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * Repositorio para la gestión de valoraciones de los usuarios en Firestore.
- * Permite almacenar y consultar las puntuaciones y reseñas sobre la resolución de incidencias.
+ * Implementa IGenericoRepository para estandarizar el feedback sobre la resolución de incidencias.
  */
 @Repository
-public class ValoracionRepository {
+public class ValoracionRepository implements IGenericoRepository<Valoracion> {
 
 	private File archivoLog = new File("logs");
-	private final Firestore firestore;
+	private final Firestore FIRESTORE;
 	private final String COLECCION = "valoraciones";
 
 	public ValoracionRepository(Firestore firestore) {
-		this.firestore = firestore;
+		this.FIRESTORE = firestore;
 	}
 
-	/**
-	 * Registra una nueva valoración en Firestore.
-	 * @param valoracion El objeto con la puntuación y el comentario del usuario.
-	 */
-	public void guardarValoracion(Valoracion valoracion) throws ExecutionException, InterruptedException, IOException {
-		DocumentReference docRef = firestore.collection(COLECCION).document(valoracion.getIdValoracion());
+	@Override
+	public void guardar(Valoracion valoracion) throws ExecutionException, InterruptedException, IOException {
+		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(valoracion.getIdValoracion());
 		ApiFuture<WriteResult> result = docRef.set(valoracion);
 
 		if (!archivoLog.exists()) {
@@ -46,45 +43,42 @@ public class ValoracionRepository {
 				+ "' registrada con éxito. Fecha: " + result.get().getUpdateTime(), false);
 	}
 
-	/**
-	 * Obtiene el listado de todas las valoraciones registradas en el sistema.
-	 */
-	public List<Valoracion> obtenerValoraciones() throws InterruptedException, ExecutionException {
-		ApiFuture<QuerySnapshot> query = firestore.collection(COLECCION).get();
-		return query.get().toObjects(Valoracion.class);
+	@Override
+	public List<Valoracion> obtenerTodos() throws InterruptedException, ExecutionException {
+		ApiFuture<QuerySnapshot> query = FIRESTORE.collection(COLECCION).get();
+		QuerySnapshot querySnapshot = query.get();
+		return querySnapshot.toObjects(Valoracion.class);
 	}
 
-	/**
-	 * Obtiene una valoración específica por su ID.
-	 */
-	public Valoracion obtenerValoracion(String idValoracion) throws InterruptedException, ExecutionException {
-		DocumentReference docRef = firestore.collection(COLECCION).document(idValoracion);
-		DocumentSnapshot doc = docRef.get().get();
+	@Override
+	public Valoracion obtenerPorId(String idValoracion) throws InterruptedException, ExecutionException {
+		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idValoracion);
+		ApiFuture<DocumentSnapshot> docSnapshot = docRef.get();
+		DocumentSnapshot doc = docSnapshot.get();
 		return doc.exists() ? doc.toObject(Valoracion.class) : null;
 	}
 
-	/**
-	 * Elimina una valoración de la base de datos.
-	 */
-	public void eliminarValoracion(String idValoracion) throws InterruptedException, ExecutionException, IOException {
-		WriteResult result = firestore.collection(COLECCION).document(idValoracion).delete().get();
+	@Override
+	public void eliminar(String idValoracion) throws InterruptedException, ExecutionException, IOException {
+		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idValoracion);
+		ApiFuture<WriteResult> result = docRef.delete();
+		WriteResult resultadoEscritura = result.get();
 
 		if (!archivoLog.exists()) {
 			archivoLog.mkdirs();
 		}
 
 		ManejadorFicheros.escribir("logs/incidencias.log", "Valoración ID: " + idValoracion
-				+ " eliminada. Fecha: " + result.getUpdateTime(), false);
+				+ " eliminada de Firestore. Fecha: " + resultadoEscritura.getUpdateTime(), false);
 	}
 
-	/**
-	 * Actualiza el contenido de una valoración existente.
-	 */
-	public void modificarValoracion(Valoracion valoracion) throws ExecutionException, InterruptedException, IOException {
-		DocumentReference docRef = firestore.collection(COLECCION).document(valoracion.getIdValoracion());
+	@Override
+	public void modificar(Valoracion valoracion) throws ExecutionException, InterruptedException, IOException {
+		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(valoracion.getIdValoracion());
 		ApiFuture<WriteResult> result = docRef.set(valoracion);
+		String fechaActualizacion = result.get().getUpdateTime().toString();
 
 		ManejadorFicheros.escribir("logs/incidencias.log", "Valoración ID: " + valoracion.getIdValoracion() 
-				+ " modificada correctamente. Fecha: " + result.get().getUpdateTime(), false);
+				+ " modificada correctamente. Fecha: " + fechaActualizacion, false);
 	}
 }

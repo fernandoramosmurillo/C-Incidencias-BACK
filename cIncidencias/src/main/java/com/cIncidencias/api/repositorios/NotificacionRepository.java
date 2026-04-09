@@ -17,25 +17,22 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * Repositorio para la gestión de notificaciones y alertas al usuario en Firestore.
- * Proporciona métodos para el envío, consulta y borrado de avisos del sistema.
+ * Implementa IGenericoRepository para estandarizar el flujo de avisos del sistema.
  */
 @Repository
-public class NotificacionRepository {
+public class NotificacionRepository implements IGenericoRepository<Notificacion> {
 
 	private File archivoLog = new File("logs");
-	private final Firestore firestore;
+	private final Firestore FIRESTORE;
 	private final String COLECCION = "notificaciones";
 
 	public NotificacionRepository(Firestore firestore) {
-		this.firestore = firestore;
+		this.FIRESTORE = firestore;
 	}
 
-	/**
-	 * Registra una nueva notificación en Firestore.
-	 * @param notificacion El objeto con la información de la alerta.
-	 */
-	public void guardarNotificacion(Notificacion notificacion) throws ExecutionException, InterruptedException, IOException {
-		DocumentReference docRef = firestore.collection(COLECCION).document(notificacion.getIdNotificacion());
+	@Override
+	public void guardar(Notificacion notificacion) throws ExecutionException, InterruptedException, IOException {
+		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(notificacion.getIdNotificacion());
 		ApiFuture<WriteResult> result = docRef.set(notificacion);
 
 		if (!archivoLog.exists()) {
@@ -46,45 +43,42 @@ public class NotificacionRepository {
 				+ "' enviada con éxito. Fecha: " + result.get().getUpdateTime(), false);
 	}
 
-	/**
-	 * Obtiene el listado de todas las notificaciones del sistema.
-	 */
-	public List<Notificacion> obtenerNotificaciones() throws InterruptedException, ExecutionException {
-		ApiFuture<QuerySnapshot> query = firestore.collection(COLECCION).get();
-		return query.get().toObjects(Notificacion.class);
+	@Override
+	public List<Notificacion> obtenerTodos() throws InterruptedException, ExecutionException {
+		ApiFuture<QuerySnapshot> query = FIRESTORE.collection(COLECCION).get();
+		QuerySnapshot querySnapshot = query.get();
+		return querySnapshot.toObjects(Notificacion.class);
 	}
 
-	/**
-	 * Obtiene una notificación específica por su ID.
-	 */
-	public Notificacion obtenerNotificacion(String idNotificacion) throws InterruptedException, ExecutionException {
-		DocumentReference docRef = firestore.collection(COLECCION).document(idNotificacion);
-		DocumentSnapshot doc = docRef.get().get();
+	@Override
+	public Notificacion obtenerPorId(String idNotificacion) throws InterruptedException, ExecutionException {
+		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idNotificacion);
+		ApiFuture<DocumentSnapshot> docSnapshot = docRef.get();
+		DocumentSnapshot doc = docSnapshot.get();
 		return doc.exists() ? doc.toObject(Notificacion.class) : null;
 	}
 
-	/**
-	 * Elimina una notificación de la base de datos.
-	 */
-	public void eliminarNotificacion(String idNotificacion) throws InterruptedException, ExecutionException, IOException {
-		WriteResult result = firestore.collection(COLECCION).document(idNotificacion).delete().get();
+	@Override
+	public void eliminar(String idNotificacion) throws InterruptedException, ExecutionException, IOException {
+		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idNotificacion);
+		ApiFuture<WriteResult> result = docRef.delete();
+		WriteResult resultadoEscritura = result.get();
 
 		if (!archivoLog.exists()) {
 			archivoLog.mkdirs();
 		}
 
 		ManejadorFicheros.escribir("logs/incidencias.log", "Notificación ID: " + idNotificacion
-				+ " eliminada. Fecha: " + result.getUpdateTime(), false);
+				+ " eliminada de Firestore. Fecha: " + resultadoEscritura.getUpdateTime(), false);
 	}
 
-	/**
-	 * Actualiza el contenido de una notificación existente.
-	 */
-	public void modificarNotificacion(Notificacion notificacion) throws ExecutionException, InterruptedException, IOException {
-		DocumentReference docRef = firestore.collection(COLECCION).document(notificacion.getIdNotificacion());
+	@Override
+	public void modificar(Notificacion notificacion) throws ExecutionException, InterruptedException, IOException {
+		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(notificacion.getIdNotificacion());
 		ApiFuture<WriteResult> result = docRef.set(notificacion);
+		String fechaActualizacion = result.get().getUpdateTime().toString();
 
 		ManejadorFicheros.escribir("logs/incidencias.log", "Notificación ID: " + notificacion.getIdNotificacion() 
-				+ " modificada correctamente. Fecha: " + result.get().getUpdateTime(), false);
+				+ " modificada correctamente. Fecha: " + fechaActualizacion, false);
 	}
 }

@@ -17,24 +17,22 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * Repositorio para la gestión de comentarios en Firestore.
- * Al ser independiente, permite buscar comentarios por usuario o por incidencia de forma eficiente.
+ * Implementa IGenericoRepository para estandarizar las operaciones CRUD.
  */
 @Repository
-public class ComentarioRepository {
+public class ComentarioRepository implements IGenericoRepository<Comentario> {
 
 	private File archivoLog = new File("logs");
-	private final Firestore firestore;
+	private final Firestore FIRESTORE;
+	private final String COLECCION = "comentarios";
 
 	public ComentarioRepository(Firestore firestore) {
-		this.firestore = firestore;
+		this.FIRESTORE = firestore;
 	}
 
-	/**
-	 * Guarda un comentario en la colección raíz "comentarios".
-	 * El objeto Comentario debe incluir el idUsuario y el idIncidencia para mantener la relación.
-	 */
-	public void guardarComentario(Comentario comentario) throws ExecutionException, InterruptedException, IOException {
-		DocumentReference docRef = firestore.collection("comentarios").document(comentario.getIdComentario());
+	@Override
+	public void guardar(Comentario comentario) throws ExecutionException, InterruptedException, IOException {
+		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(comentario.getIdComentario());
 		ApiFuture<WriteResult> result = docRef.set(comentario);
 
 		if (!archivoLog.exists()) {
@@ -45,29 +43,24 @@ public class ComentarioRepository {
 				+ " registrado con éxito. Fecha: " + result.get().getUpdateTime(), false);
 	}
 
-	/**
-	 * Recupera todos los comentarios de la base de datos.
-	 */
-	public List<Comentario> obtenerComentarios() throws InterruptedException, ExecutionException {
-		ApiFuture<QuerySnapshot> query = firestore.collection("comentarios").get();
+	@Override
+	public List<Comentario> obtenerTodos() throws InterruptedException, ExecutionException {
+		ApiFuture<QuerySnapshot> query = FIRESTORE.collection(COLECCION).get();
 		QuerySnapshot querySnapshot = query.get();
 		return querySnapshot.toObjects(Comentario.class);
 	}
 
-	/**
-	 * Busca un comentario específico por su identificador único.
-	 */
-	public Comentario obtenerComentario(String idComentario) throws InterruptedException, ExecutionException {
-		DocumentReference docRef = firestore.collection("comentarios").document(idComentario);
+	@Override
+	public Comentario obtenerPorId(String idComentario) throws InterruptedException, ExecutionException {
+		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idComentario);
 		ApiFuture<DocumentSnapshot> docSnapshot = docRef.get();
-		return docSnapshot.get().toObject(Comentario.class);
+		DocumentSnapshot doc = docSnapshot.get();
+		return doc.exists() ? doc.toObject(Comentario.class) : null;
 	}
 
-	/**
-	 * Elimina un comentario de Firestore.
-	 */
-	public void eliminarComentario(String idComentario) throws InterruptedException, ExecutionException, IOException {
-		DocumentReference docRef = firestore.collection("comentarios").document(idComentario);
+	@Override
+	public void eliminar(String idComentario) throws InterruptedException, ExecutionException, IOException {
+		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idComentario);
 		ApiFuture<WriteResult> result = docRef.delete();
 		WriteResult resultadoEscritura = result.get();
 
@@ -79,11 +72,9 @@ public class ComentarioRepository {
 				+ " eliminado de Firestore. Fecha: " + resultadoEscritura.getUpdateTime(), false);
 	}
 
-	/**
-	 * Actualiza un comentario existente (por ejemplo, para edición o moderación).
-	 */
-	public void modificarComentario(Comentario comentario) throws ExecutionException, InterruptedException, IOException {
-		DocumentReference docRef = firestore.collection("comentarios").document(comentario.getIdComentario());
+	@Override
+	public void modificar(Comentario comentario) throws ExecutionException, InterruptedException, IOException {
+		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(comentario.getIdComentario());
 		ApiFuture<WriteResult> result = docRef.set(comentario);
 		String fechaActualizacion = result.get().getUpdateTime().toString();
 
