@@ -5,14 +5,16 @@ import com.cIncidencias.api.repositorios.ComentarioRepository;
 import com.cIncidencias.api.excepciones.NullParamsException;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Servicio para gestionar la lógica de los comentarios.
- * Se encarga de validar los datos antes de persistirlos en el repositorio.
+ * Implementa IGenericoService para asegurar un flujo estandarizado de validación y persistencia.
  */
 @Service
-public class ComentarioService {
+public class ComentarioService implements IGenericoService<Comentario> {
 
 	private final ComentarioRepository comentarioRepository;
 
@@ -21,13 +23,16 @@ public class ComentarioService {
 	}
 
 	/**
-	 * Registra un nuevo comentario validando que tenga contenido y referencias.
-	 * @param comentario Objeto con la información del comentario.
-	 * @throws Exception Si faltan datos obligatorios o hay error en la base de datos.
+	 * Valida y registra un nuevo comentario. 
+	 * Verifica que el objeto no sea nulo y que el texto contenga caracteres visibles.
+	 * * @param comentario Objeto Comentario a guardar.
+	 * @throws NullParamsException Si el comentario es nulo o el texto está vacío.
+	 * @throws ExecutionException Si ocurre un error en la ejecución de la tarea en Firestore.
+	 * @throws InterruptedException Si se interrumpe el hilo durante la comunicación.
+	 * @throws IOException Si falla la escritura del log local.
 	 */
-	public void publicarComentario(Comentario comentario) throws Exception {
-		
-		// Validaciones de valores
+	@Override
+	public void guardar(Comentario comentario) throws NullParamsException, ExecutionException, InterruptedException, IOException {
 		if (comentario == null) {
 			throw new NullParamsException("Se necesita un comentario para publicarlo");
 		}
@@ -36,33 +41,65 @@ public class ComentarioService {
 			throw new NullParamsException("El texto del comentario no puede estar vacío.");
 		}
 		
-		comentarioRepository.guardarComentario(comentario);
+		comentarioRepository.guardar(comentario);
 	}
 
 	/**
-	 * Obtiene todos los comentarios registrados.
+	 * Recupera todos los comentarios almacenados en Firestore.
+	 * * @return Lista de objetos Comentario.
+	 * @throws ExecutionException Si hay un fallo al recuperar los datos del servidor.
+	 * @throws InterruptedException Si se interrumpe la conexión durante la consulta.
 	 */
-	public List<Comentario> obtenerTodos() throws Exception {
-		return comentarioRepository.obtenerComentarios();
+	@Override
+	public List<Comentario> obtenerTodos() throws ExecutionException, InterruptedException {
+		return comentarioRepository.obtenerTodos();
 	}
 
 	/**
-	 * Busca un comentario por su ID único.
+	 * Busca un comentario específico mediante su identificador único.
+	 * * @param idComentario El identificador del comentario.
+	 * @return El Comentario encontrado o null si no existe.
+	 * @throws NullParamsException Si el ID proporcionado es nulo.
+	 * @throws ExecutionException Si la consulta falla en el servidor.
+	 * @throws InterruptedException Si se corta la comunicación con Firestore.
 	 */
-	public Comentario obtenerPorId(String idComentario) throws Exception {
+	@Override
+	public Comentario obtenerPorId(String idComentario) throws NullParamsException, ExecutionException, InterruptedException {
 		if (idComentario == null) {
 			throw new NullParamsException("Es necesario un ID para buscar el comentario.");
 		}
-		return comentarioRepository.obtenerComentario(idComentario);
+		return comentarioRepository.obtenerPorId(idComentario);
 	}
 
 	/**
-	 * Elimina un comentario del sistema.
+	 * Elimina un comentario del sistema tras validar que el ID no es nulo.
+	 * * @param idComentario ID del comentario a borrar.
+	 * @throws NullParamsException Si el ID es nulo.
+	 * @throws ExecutionException Si el borrado falla en la base de datos.
+	 * @throws InterruptedException Si el proceso es interrumpido.
+	 * @throws IOException Si ocurre un error al registrar la acción en el log.
 	 */
-	public void borrarComentario(String idComentario) throws Exception {
+	@Override
+	public void eliminar(String idComentario) throws NullParamsException, ExecutionException, InterruptedException, IOException {
 		if (idComentario == null) {
 			throw new NullParamsException("Es necesario un ID para eliminar el comentario.");
 		}
-		comentarioRepository.eliminarComentario(idComentario);
+		comentarioRepository.eliminar(idComentario);
+	}
+
+	/**
+	 * Actualiza la información de un comentario existente.
+	 * * @param comentario Objeto con los datos actualizados.
+	 * @throws NullParamsException Si el objeto o su ID son nulos.
+	 * @throws ExecutionException Si la actualización falla en Firestore.
+	 * @throws InterruptedException Si se interrumpe la tarea asíncrona.
+	 * @throws IOException Si falla el registro en el log local.
+	 */
+	@Override
+	public void modificar(Comentario comentario) throws NullParamsException, ExecutionException, InterruptedException, IOException {
+		if (comentario == null || comentario.getIdComentario() == null) {
+			throw new NullParamsException("Datos insuficientes para modificar el comentario.");
+		}
+		comentarioRepository.modificar(comentario);
 	}
 }

@@ -1,12 +1,12 @@
-package com.cIncidencias.api.repositorios;
+package com.cIncidencias.api.servicios;
 
 import java.util.List;
 
 /**
- * Interfaz genérica para los repositorios. Define las operaciones CRUD básicas.
- * @param <T> El tipo de modelo (Incidencia, Usuario, Noticia, etc.)
+ * Interfaz genérica para los servicios.
+ * @param <T> El modelo de datos (Comentario, Incidencia, Usuario, etc.)
  */
-public interface IGenericoRepository<T> {
+public interface IGenericoService<T> {
     
     void guardar(T objeto) throws Exception;
     

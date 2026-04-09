@@ -22,7 +22,7 @@ public class Incidencia extends ModeloBase {
     public enum Prioridades { MINIMO, BAJA, MEDIA, ALTA, MUY_ALTA, URGENTE }
 
     private String idIncidencia;
-    private String nombre;
+    private String titulo;
     private String descripcion;
     private GeoPoint ubicacion;
     private String imagenUrl;
@@ -45,7 +45,7 @@ public class Incidencia extends ModeloBase {
 			EstadosIncidencia estadoIncidencia, Valoracion valoracion) {
 		super();
 		this.idIncidencia = idIncidencia;
-		this.nombre = nombre;
+		this.titulo = nombre;
 		this.descripcion = descripcion;
 		this.ubicacion = ubicacion;
 		this.imagenUrl = imagenUrl;
