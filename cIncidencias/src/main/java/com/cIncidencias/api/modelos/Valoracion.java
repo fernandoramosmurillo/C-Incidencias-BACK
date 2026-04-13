@@ -1,5 +1,6 @@
 package com.cIncidencias.api.modelos;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.cloud.Timestamp;
 import lombok.Data;
 
@@ -11,6 +12,7 @@ public class Valoracion extends ModeloBase{
     private String opinion;           // El texto detallado con la experiencia del ciudadano
     private Integer puntuacion; // La nota numérica (rango: de 1 a 5)
     
+    @JsonDeserialize(using = TimestampDeserializer.class)
     private Timestamp fechaPublicacion;
 
 	public Valoracion(Estados estado, String idValoracion, String nombre, String opinion, Integer puntuacionP,

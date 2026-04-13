@@ -1,6 +1,8 @@
 package com.cIncidencias.api.modelos;
 
 import java.util.List;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.cloud.Timestamp;
 import lombok.Data;
 
@@ -21,6 +23,7 @@ public class Usuario extends ModeloBase {
     protected String clave;              // Credencial de acceso al sistema
     
     // Al igual que en otras clases, se utilizan Timestamps de Google para las fechas
+    @JsonDeserialize(using = TimestampDeserializer.class)
     protected Timestamp fechaNacimiento;  
     
     protected RolesUsuario rolUsuario;   // Nivel de privilegios asignado
@@ -32,7 +35,9 @@ public class Usuario extends ModeloBase {
     protected Boolean recibirNotificaciones; // Consentimiento para el envío de alertas
     
     // Ciclo de vida de la cuenta
-    protected Timestamp fechaCreacion;    
+    @JsonDeserialize(using = TimestampDeserializer.class)
+    protected Timestamp fechaCreacion;
+    @JsonDeserialize(using = TimestampDeserializer.class)
     protected Timestamp fechaEliminacion; 
     
     // Registro histórico de las comunicaciones enviadas al usuario

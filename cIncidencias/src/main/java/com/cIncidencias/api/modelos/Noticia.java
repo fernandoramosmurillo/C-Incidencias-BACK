@@ -1,5 +1,6 @@
 package com.cIncidencias.api.modelos;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.cloud.Timestamp;
 import lombok.Data;
 
@@ -15,6 +16,7 @@ public class Noticia extends ModeloBase {
     private String categoria;       // Ej: "Avisos", "Eventos", "Cortes de tráfico"
     
     // Al igual que en todo el proyecto, usamos el Timestamp de Google Cloud
+    @JsonDeserialize(using = TimestampDeserializer.class)
     private Timestamp fechaPublicacion; 
     
     private String idAutor;         // El ID del Administrador que redactó la noticia

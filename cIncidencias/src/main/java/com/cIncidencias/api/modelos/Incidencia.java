@@ -2,7 +2,10 @@ package com.cIncidencias.api.modelos;
 
 import java.util.List;
 import java.util.TreeMap;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.cloud.Timestamp;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.GeoPoint;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,12 +30,17 @@ public class Incidencia extends ModeloBase {
     private GeoPoint ubicacion;
     private String imagenUrl;
     
-    private Timestamp fechaCreacion; 
+    @JsonDeserialize(using = TimestampDeserializer.class)
+    private Timestamp fechaCreacion;
+    @JsonDeserialize(using = TimestampDeserializer.class)
     private Timestamp fechaCierre;
     
-    private Ciudadano usuarioCiudadano; 
-    private TreeMap<String, OperarioMunicipal> listaOperarios; 
-    private List<Comentario> comentarios;
+    @JsonDeserialize(using = DocumentReferenceDeserializer.class)
+    private DocumentReference usuarioCiudadano; 
+    @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
+    private TreeMap<String, DocumentReference> listaOperarios; 
+    @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
+    private List<DocumentReference> comentarios;
     
     // Atributos de categorización propios de la incidencia
     private Prioridades prioridad;
@@ -40,8 +48,8 @@ public class Incidencia extends ModeloBase {
     private Valoracion valoracion;
     
 	public Incidencia(String idIncidencia, String nombre, String descripcion, GeoPoint ubicacion, String imagenUrl,
-			Timestamp fechaCreacion, Timestamp fechaCierre, Ciudadano usuarioCiudadano,
-			TreeMap<String, OperarioMunicipal> listaOperarios, List<Comentario> comentarios, Prioridades prioridad,
+			Timestamp fechaCreacion, Timestamp fechaCierre, DocumentReference usuarioCiudadano,
+			TreeMap<String, DocumentReference> listaOperarios, List<DocumentReference> comentarios, Prioridades prioridad,
 			EstadosIncidencia estadoIncidencia, Valoracion valoracion) {
 		super();
 		this.idIncidencia = idIncidencia;
