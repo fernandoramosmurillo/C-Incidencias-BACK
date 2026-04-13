@@ -1,5 +1,6 @@
 package com.cIncidencias.api.modelos;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.cloud.Timestamp;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ public class Comentario extends ModeloBase {
     private String texto;             // El contenido del mensaje (lo que escribe el usuario)
     
     // Al igual que en el resto del proyecto, usamos el tiempo oficial de Google Cloud
+    @JsonDeserialize(using = TimestampDeserializer.class)
     private Timestamp fechaPublicacion; 
     
     // Indica si el comentario es solo para operarios/admin o si es público para el ciudadano
