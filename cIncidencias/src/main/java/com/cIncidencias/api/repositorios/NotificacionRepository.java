@@ -39,8 +39,9 @@ public class NotificacionRepository implements IGenericoRepository<Notificacion>
 			archivoLog.mkdirs();
 		}
 
+		// Aplicado .toDate() para mostrar la fecha local en el log
 		ManejadorFicheros.escribir("logs/incidencias.log", "Notificación ID: '" + notificacion.getIdNotificacion() 
-				+ "' enviada con éxito. Fecha: " + result.get().getUpdateTime(), false);
+				+ "' enviada con éxito. Fecha: " + result.get().getUpdateTime().toDate(), false);
 	}
 
 	@Override
@@ -68,15 +69,18 @@ public class NotificacionRepository implements IGenericoRepository<Notificacion>
 			archivoLog.mkdirs();
 		}
 
+		// Aplicado .toDate() para mostrar la fecha local en el log
 		ManejadorFicheros.escribir("logs/incidencias.log", "Notificación ID: " + idNotificacion
-				+ " eliminada de Firestore. Fecha: " + resultadoEscritura.getUpdateTime(), false);
+				+ " eliminada de Firestore. Fecha: " + resultadoEscritura.getUpdateTime().toDate(), false);
 	}
 
 	@Override
 	public void modificar(Notificacion notificacion) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(notificacion.getIdNotificacion());
 		ApiFuture<WriteResult> result = docRef.set(notificacion);
-		String fechaActualizacion = result.get().getUpdateTime().toString();
+		
+		// Aplicado .toDate() para mantener la consistencia local
+		Object fechaActualizacion = result.get().getUpdateTime().toDate();
 
 		ManejadorFicheros.escribir("logs/incidencias.log", "Notificación ID: " + notificacion.getIdNotificacion() 
 				+ " modificada correctamente. Fecha: " + fechaActualizacion, false);

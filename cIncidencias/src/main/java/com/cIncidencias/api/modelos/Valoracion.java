@@ -3,7 +3,9 @@ package com.cIncidencias.api.modelos;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.cloud.Timestamp;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Data // Getters y Setters automáticos para mantener el código limpio
 public class Valoracion extends ModeloBase{
 
@@ -24,10 +26,4 @@ public class Valoracion extends ModeloBase{
 		this.puntuacion = puntuacionP;
 		this.fechaPublicacion = fechaPublicacion;
 	}
-
-	public Valoracion(Estados estado) {
-		super(estado);
-	} 
-    
-    
 }

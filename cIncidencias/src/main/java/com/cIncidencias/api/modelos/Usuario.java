@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.cloud.Timestamp;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Enumeraciones para la gestión de permisos y métodos de autenticación.
@@ -13,6 +14,8 @@ enum RolesUsuario { ADMINISTRADOR, OPERARIO, CIUDADANO }
 enum TiposAcceso { CORREO_CONTRASEÑA, GOOGLE, CLAVE_ADMIN }
 
 @Data // Genera los Getters y Setters para mantener el código más limpio y ordenado
+@NoArgsConstructor
+
 public class Usuario extends ModeloBase {
     
     // Identificadores y datos de contacto del perfil
@@ -63,10 +66,4 @@ public class Usuario extends ModeloBase {
 		this.fechaEliminacion = fechaEliminacion;
 		this.notificacionesRecibidas = notificacionesRecibidas;
 	}
-
-	public Usuario(Estados estado) {
-		super(estado);
-	} 
-    
-    
 }

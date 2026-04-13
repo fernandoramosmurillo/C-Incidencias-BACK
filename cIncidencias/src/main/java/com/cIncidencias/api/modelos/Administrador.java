@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.cloud.Timestamp;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 // Diferentes áreas que puede gestionar un administrador en el ayuntamiento
 enum Departamentos {
@@ -13,6 +14,7 @@ enum Departamentos {
 	D_CERRAJERIA, D_ALBAÑILERIA
 }
 
+@NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true) // Comprueba los datos del padre (Usuario) al hacer comparaciones
 public class Administrador extends Usuario {
@@ -52,14 +54,4 @@ public class Administrador extends Usuario {
 		this.claveAdmin = claveAdmin;
 		this.listaNoticiasEnviadas = listaNoticiasEnviadas;
 	}
-
-	public Administrador(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
-			String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
-			TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion,
-			Timestamp fechaEliminacion, List<Notificacion> notificacionesRecibidas) {
-		super(estado, idUsuario, nombre, apellidos, correoElectronico, clave, fechaNacimiento, rolUsuario,
-				fotoPerfilUrl, tipoAcceso, bloqueado, recibirNotificaciones, fechaCreacion, fechaEliminacion,
-				notificacionesRecibidas);
-	}
-
 }

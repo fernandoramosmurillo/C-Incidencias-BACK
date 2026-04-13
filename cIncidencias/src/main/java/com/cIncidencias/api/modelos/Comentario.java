@@ -1,11 +1,14 @@
 package com.cIncidencias.api.modelos;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Data // Getters y Setters automáticos para mantener el código limpio y ordenado
 public class Comentario extends ModeloBase {
 
@@ -20,6 +23,7 @@ public class Comentario extends ModeloBase {
     private Boolean esPrivado;        
     
     // El objeto Usuario que escribió el mensaje (Ciudadano, Operario o Admin)
+    @JsonSerialize(using = DocumentReferenceSerializer.class)
     @JsonDeserialize(using = DocumentReferenceDeserializer.class)
     private DocumentReference usuarioAutor;
 
@@ -32,11 +36,4 @@ public class Comentario extends ModeloBase {
 		this.esPrivado = esPrivado;
 		this.usuarioAutor = usuarioAutor;
 	}
-
-	public Comentario() {
-		super();
-	}     
-    
-	
-    
 }

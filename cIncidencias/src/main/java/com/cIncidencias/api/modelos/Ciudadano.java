@@ -6,7 +6,9 @@ import com.google.cloud.Timestamp;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true) // Se encarga de comprobar los datos del padre cuando haga un equals o hash
 public class Ciudadano extends Usuario {
@@ -34,18 +36,5 @@ public class Ciudadano extends Usuario {
 		this.direccion = direccion;
 		this.incidenciasSolicitadas = incidenciasSolicitadas;
 		this.incidenciasCalificadas = incidenciasCalificadas;
-	}
-
-	public Ciudadano(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
-			String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
-			TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion,
-			Timestamp fechaEliminacion, List<Notificacion> notificacionesRecibidas) {
-		super(estado, idUsuario, nombre, apellidos, correoElectronico, clave, fechaNacimiento, rolUsuario,
-				fotoPerfilUrl, tipoAcceso, bloqueado, recibirNotificaciones, fechaCreacion, fechaEliminacion,
-				notificacionesRecibidas);
-	}
-    
-	
-	
-    
+	} 
 }

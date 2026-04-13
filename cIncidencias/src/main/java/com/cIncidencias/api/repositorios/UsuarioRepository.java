@@ -39,8 +39,9 @@ public class UsuarioRepository implements IGenericoRepository<Usuario> {
 			archivoLog.mkdirs();
 		}
 
+		// Añadido .toDate() para mostrar la hora local de España
 		ManejadorFicheros.escribir("logs/incidencias.log", "Usuario " + usuario.getNombre() + " "
-				+ usuario.getApellidos() + " guardado con éxito en Firestore. Fecha: " + result.get().getUpdateTime(),
+				+ usuario.getApellidos() + " guardado con éxito en Firestore. Fecha: " + result.get().getUpdateTime().toDate(),
 				false);
 	}
 
@@ -69,15 +70,18 @@ public class UsuarioRepository implements IGenericoRepository<Usuario> {
 			archivoLog.mkdirs();
 		}
 
+		// Añadido .toDate() para mostrar la hora local de España
 		ManejadorFicheros.escribir("logs/incidencias.log", "Usuario con ID: " + idUsuario
-				+ " eliminado con éxito de Firestore. Fecha: " + resultadoEscritura.getUpdateTime(), false);
+				+ " eliminado con éxito de Firestore. Fecha: " + resultadoEscritura.getUpdateTime().toDate(), false);
 	}
 
 	@Override
 	public void modificar(Usuario usuario) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(usuario.getIdUsuario());
 		ApiFuture<WriteResult> result = docRef.set(usuario);
-		String fechaActualizacion = result.get().getUpdateTime().toString();
+		
+		// Cambiado a .toDate() para consistencia local
+		Object fechaActualizacion = result.get().getUpdateTime().toDate();
 
 		ManejadorFicheros.escribir("logs/incidencias.log","Usuario ID: " + usuario.getIdUsuario() + " [" + usuario.getNombre()
 				+ "] modificado correctamente. Fecha: " + fechaActualizacion, false);

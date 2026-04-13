@@ -3,7 +3,9 @@ package com.cIncidencias.api.modelos;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.cloud.Timestamp;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Data // Getters y Setters automáticos para un código más limpio y profesional
 public class Noticia extends ModeloBase {
 
@@ -36,11 +38,4 @@ public class Noticia extends ModeloBase {
 		this.idAutor = idAutor;
 		this.esDestacada = esDestacada;
 	}
-
-	public Noticia(Estados estado) {
-		super(estado);
-	}
-    
-	
-    
 }

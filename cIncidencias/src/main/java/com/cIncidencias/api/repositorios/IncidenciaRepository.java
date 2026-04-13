@@ -40,7 +40,7 @@ public class IncidenciaRepository implements IGenericoRepository<Incidencia> {
 		}
 
 		ManejadorFicheros.escribir("logs/incidencias.log", "Incidencia ID: " + incidencia.getIdIncidencia() 
-				+ " registrada con éxito. Fecha: " + result.get().getUpdateTime(), false);
+				+ " registrada con éxito. Fecha: " + result.get().getUpdateTime().toDate(), false);
 	}
 
 	@Override
@@ -69,14 +69,16 @@ public class IncidenciaRepository implements IGenericoRepository<Incidencia> {
 		}
 
 		ManejadorFicheros.escribir("logs/incidencias.log", "Incidencia ID: " + idIncidencia
-				+ " eliminada de Firestore. Fecha: " + resultadoEscritura.getUpdateTime(), false);
+				+ " eliminada de Firestore. Fecha: " + resultadoEscritura.getUpdateTime().toDate(), false);
 	}
 
 	@Override
 	public void modificar(Incidencia incidencia) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(incidencia.getIdIncidencia());
 		ApiFuture<WriteResult> result = docRef.set(incidencia);
-		String fechaActualizacion = result.get().getUpdateTime().toString();
+		
+		// Aplicado .toDate() para mantener la consistencia en los logs
+		Object fechaActualizacion = result.get().getUpdateTime().toDate();
 
 		ManejadorFicheros.escribir("logs/incidencias.log", "Incidencia ID: " + incidencia.getIdIncidencia() 
 				+ " modificada correctamente. Fecha: " + fechaActualizacion, false);

@@ -18,7 +18,8 @@ public class ManejadorFicheros {
                 contenido.append(linea).append("\n");
             }
         } catch (IOException e) {
-            return "Error al leer el archivo: " + e.getMessage();
+        	System.err.println("Error en lectura: " + e.getMessage());
+            return null;
         }
         
         return contenido.toString(); // Convertimos el constructor a String real
@@ -32,7 +33,7 @@ public class ManejadorFicheros {
     public static void escribir(String ruta, String texto, boolean sobrescribir) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(ruta,!sobrescribir))) {
             
-            pw.print(texto);
+            pw.println(texto);
             
             System.out.println("Archivo guardado con éxito.");
             

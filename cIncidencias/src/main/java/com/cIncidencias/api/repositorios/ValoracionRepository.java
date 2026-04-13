@@ -39,8 +39,9 @@ public class ValoracionRepository implements IGenericoRepository<Valoracion> {
 			archivoLog.mkdirs();
 		}
 
+		// Aplicado .toDate() para mostrar la fecha local en el log
 		ManejadorFicheros.escribir("logs/incidencias.log", "Valoración ID: '" + valoracion.getIdValoracion() 
-				+ "' registrada con éxito. Fecha: " + result.get().getUpdateTime(), false);
+				+ "' registrada con éxito. Fecha: " + result.get().getUpdateTime().toDate(), false);
 	}
 
 	@Override
@@ -68,15 +69,18 @@ public class ValoracionRepository implements IGenericoRepository<Valoracion> {
 			archivoLog.mkdirs();
 		}
 
+		// Aplicado .toDate() para mostrar la fecha local en el log
 		ManejadorFicheros.escribir("logs/incidencias.log", "Valoración ID: " + idValoracion
-				+ " eliminada de Firestore. Fecha: " + resultadoEscritura.getUpdateTime(), false);
+				+ " eliminada de Firestore. Fecha: " + resultadoEscritura.getUpdateTime().toDate(), false);
 	}
 
 	@Override
 	public void modificar(Valoracion valoracion) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(valoracion.getIdValoracion());
 		ApiFuture<WriteResult> result = docRef.set(valoracion);
-		String fechaActualizacion = result.get().getUpdateTime().toString();
+		
+		// Aplicado .toDate() para consistencia local
+		Object fechaActualizacion = result.get().getUpdateTime().toDate();
 
 		ManejadorFicheros.escribir("logs/incidencias.log", "Valoración ID: " + valoracion.getIdValoracion() 
 				+ " modificada correctamente. Fecha: " + fechaActualizacion, false);

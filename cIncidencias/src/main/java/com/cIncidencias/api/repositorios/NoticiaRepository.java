@@ -39,8 +39,9 @@ public class NoticiaRepository implements IGenericoRepository<Noticia> {
 			archivoLog.mkdirs();
 		}
 
+		// Aplicado .toDate() para mostrar la fecha local en el log
 		ManejadorFicheros.escribir("logs/incidencias.log", "Noticia '" + noticia.getTitulo() 
-				+ "' publicada con éxito. Fecha: " + result.get().getUpdateTime(), false);
+				+ "' publicada con éxito. Fecha: " + result.get().getUpdateTime().toDate(), false);
 	}
 
 	@Override
@@ -68,15 +69,18 @@ public class NoticiaRepository implements IGenericoRepository<Noticia> {
 			archivoLog.mkdirs();
 		}
 
+		// Aplicado .toDate() para mostrar la fecha local en el log
 		ManejadorFicheros.escribir("logs/incidencias.log", "Noticia ID: " + idNoticia
-				+ " eliminada. Fecha: " + resultadoEscritura.getUpdateTime(), false);
+				+ " eliminada. Fecha: " + resultadoEscritura.getUpdateTime().toDate(), false);
 	}
 
 	@Override
 	public void modificar(Noticia noticia) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(noticia.getIdNoticia());
 		ApiFuture<WriteResult> result = docRef.set(noticia);
-		String fechaActualizacion = result.get().getUpdateTime().toString();
+		
+		// Aplicado .toDate() para consistencia local
+		Object fechaActualizacion = result.get().getUpdateTime().toDate();
 
 		ManejadorFicheros.escribir("logs/incidencias.log", "Noticia ID: " + noticia.getIdNoticia() 
 				+ " modificada correctamente. Fecha: " + fechaActualizacion, false);

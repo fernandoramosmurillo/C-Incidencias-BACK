@@ -4,16 +4,19 @@ import java.util.List;
 import java.util.TreeMap;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.GeoPoint;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * Representa una incidencia en el sistema. 
  * Hereda el estado de persistencia de ModeloBase y gestiona su propio flujo de trabajo.
  */
+@NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Incidencia extends ModeloBase {
@@ -36,9 +39,12 @@ public class Incidencia extends ModeloBase {
     private Timestamp fechaCierre;
     
     @JsonDeserialize(using = DocumentReferenceDeserializer.class)
-    private DocumentReference usuarioCiudadano; 
+    @JsonSerialize(using = DocumentReferenceSerializer.class)
+    private DocumentReference usuarioCiudadano;
+    @JsonSerialize(contentUsing = DocumentReferenceSerializer.class)
     @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
-    private TreeMap<String, DocumentReference> listaOperarios; 
+    private TreeMap<String, DocumentReference> listaOperarios;
+    @JsonSerialize(contentUsing = DocumentReferenceSerializer.class)
     @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
     private List<DocumentReference> comentarios;
     
@@ -65,15 +71,5 @@ public class Incidencia extends ModeloBase {
 		this.prioridad = prioridad;
 		this.estadoIncidencia = estadoIncidencia;
 		this.valoracion = valoracion;
-	}
-
-	public Incidencia() {
-		super();
-	}
-	
-	
-    
-    
-
-    
+	} 
 }

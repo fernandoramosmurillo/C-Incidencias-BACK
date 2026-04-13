@@ -3,13 +3,16 @@ package com.cIncidencias.api.modelos;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.firestore.DocumentReference;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 // Origen de la alerta para saber si viene de la propia incidencia, del sistema o de otro usuario
 enum TiposOrigen { SISTEMA, INCIDENCIA, USUARIO }
 
+@NoArgsConstructor
 @Data // Getters y Setters automáticos para mantener el código más limpio y ordenado
 public class Notificacion extends ModeloBase{
 
@@ -22,6 +25,7 @@ public class Notificacion extends ModeloBase{
     
     private TiposOrigen tipoOrigen;  // Clasificación según quién o qué genera la alerta
     @JsonDeserialize(using = DocumentReferenceDeserializer.class)
+    @JsonSerialize(using = DocumentReferenceSerializer.class)
     private DocumentReference idOrigen;         // ID específico del disparador (ej: el idIncidencia)
     
 	public Notificacion(Estados estado, String idNotificacion, String titulo, String mensaje,
@@ -34,10 +38,4 @@ public class Notificacion extends ModeloBase{
 		this.tipoOrigen = tipoOrigen;
 		this.idOrigen = idOrigen;
 	}
-
-	public Notificacion(Estados estado) {
-		super(estado);
-	}
-    
-    
 }

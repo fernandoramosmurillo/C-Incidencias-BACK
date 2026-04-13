@@ -3,11 +3,13 @@ package com.cIncidencias.api.modelos;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * Listado de oficios disponibles para asignar según el tipo de avería.
@@ -17,6 +19,7 @@ enum Especialidades {
     LIMPIEZA_VIARIA, CARPINTERIA, PINTURA, CERRAJERIA, ALBAÑILERIA 
 }
 
+@NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true) // Se encarga de comprobar los datos del padre cuando haga un equals o hash
 public class OperarioMunicipal extends Usuario {
@@ -33,6 +36,7 @@ public class OperarioMunicipal extends Usuario {
     
     // Relación directa con las incidencias que tiene entre manos
     @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
+    @JsonSerialize(using = DocumentReferenceSerializer.class)
     private List<DocumentReference> listaIncidenciasAsignadas;
 
 	public OperarioMunicipal(Estados estado, String idUsuario, String nombre, String apellidos,
@@ -52,16 +56,4 @@ public class OperarioMunicipal extends Usuario {
 		this.incidenciasResueltas = incidenciasResueltas;
 		this.listaIncidenciasAsignadas = listaIncidenciasAsignadas;
 	}
-
-	public OperarioMunicipal(Estados estado, String idUsuario, String nombre, String apellidos,
-			String correoElectronico, String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario,
-			String fotoPerfilUrl, TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones,
-			Timestamp fechaCreacion, Timestamp fechaEliminacion, List<Notificacion> notificacionesRecibidas) {
-		super(estado, idUsuario, nombre, apellidos, correoElectronico, clave, fechaNacimiento, rolUsuario,
-				fotoPerfilUrl, tipoAcceso, bloqueado, recibirNotificaciones, fechaCreacion, fechaEliminacion,
-				notificacionesRecibidas);
-	}
-
-	
-    
 }
