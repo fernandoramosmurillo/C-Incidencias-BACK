@@ -2,7 +2,10 @@ package com.cIncidencias.api.modelos;
 
 import java.util.List;
 
+import com.cIncidencias.api.modelos.Serializadores.TimestampDeserializer;
+import com.cIncidencias.api.modelos.Serializadores.TimestampSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.Timestamp;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,6 +31,7 @@ public class Administrador extends Usuario {
 
 	private Departamentos departamento; // El área específica asignada al administrador
 
+	@JsonSerialize(using = TimestampSerializer.class)
 	@JsonDeserialize(using = TimestampDeserializer.class)
 	private Timestamp fechaCambioClave;
 

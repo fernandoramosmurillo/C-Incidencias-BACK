@@ -2,6 +2,8 @@ package com.cIncidencias.api.modelos;
 
 import java.util.List;
 
+import com.cIncidencias.api.modelos.Serializadores.DocumentReferenceDeserializer;
+import com.cIncidencias.api.modelos.Serializadores.DocumentReferenceSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.Timestamp;

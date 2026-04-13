@@ -1,4 +1,4 @@
-package com.cIncidencias.api.modelos;
+package com.cIncidencias.api.modelos.Serializadores;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;

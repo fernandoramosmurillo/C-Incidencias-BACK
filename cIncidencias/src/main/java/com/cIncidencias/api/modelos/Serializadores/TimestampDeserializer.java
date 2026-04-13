@@ -1,4 +1,4 @@
-package com.cIncidencias.api.modelos;
+package com.cIncidencias.api.modelos.Serializadores;
 
 import java.io.IOException;
 

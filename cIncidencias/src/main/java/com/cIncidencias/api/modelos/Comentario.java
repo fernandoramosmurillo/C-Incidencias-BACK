@@ -1,5 +1,9 @@
 package com.cIncidencias.api.modelos;
 
+import com.cIncidencias.api.modelos.Serializadores.DocumentReferenceDeserializer;
+import com.cIncidencias.api.modelos.Serializadores.DocumentReferenceSerializer;
+import com.cIncidencias.api.modelos.Serializadores.TimestampDeserializer;
+import com.cIncidencias.api.modelos.Serializadores.TimestampSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.Timestamp;
@@ -16,6 +20,7 @@ public class Comentario extends ModeloBase {
     private String texto;             // El contenido del mensaje (lo que escribe el usuario)
     
     // Al igual que en el resto del proyecto, usamos el tiempo oficial de Google Cloud
+    @JsonSerialize(using = TimestampSerializer.class)
     @JsonDeserialize(using = TimestampDeserializer.class)
     private Timestamp fechaPublicacion; 
     
