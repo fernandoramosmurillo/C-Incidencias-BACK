@@ -1,6 +1,7 @@
 package com.cIncidencias.api.repositorios;
 
 import java.util.List;
+import com.cIncidencias.api.modelos.ModeloBase.Estados;
 
 /**
  * Interfaz genérica para los repositorios. Define las operaciones CRUD básicas.
@@ -17,4 +18,7 @@ public interface IGenericoRepository<T> {
     void eliminar(String id) throws Exception;
     
     void modificar(T objeto) throws Exception;
+
+	void cambiarEstado(String idComentario, Estados estado) throws Exception;
+			
 }

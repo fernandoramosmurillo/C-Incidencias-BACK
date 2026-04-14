@@ -1,6 +1,7 @@
 package com.cIncidencias.api.repositorios;
 
 import com.cIncidencias.api.ficheros.ManejadorFicheros;
+import com.cIncidencias.api.modelos.ModeloBase;
 import com.cIncidencias.api.modelos.Noticia;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
@@ -84,5 +85,27 @@ public class NoticiaRepository implements IGenericoRepository<Noticia> {
 
 		ManejadorFicheros.escribir("logs/incidencias.log", "Noticia ID: " + noticia.getIdNoticia() 
 				+ " modificada correctamente. Fecha: " + fechaActualizacion, false);
+	}
+	
+	@Override
+	public void cambiarEstado(String idNoticia, ModeloBase.Estados estado)
+	        throws InterruptedException, ExecutionException, IOException {
+
+	    DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idNoticia);
+
+	    ApiFuture<WriteResult> result = docRef.update("estado", estado.name());
+	    WriteResult updateResult = result.get();
+
+	    if (!archivoLog.exists()) {
+	        archivoLog.mkdirs();
+	    }
+
+	    ManejadorFicheros.escribir(
+	            "logs/incidencias.log",
+	            "Noticia ID: " + idNoticia +
+	                    " cambio de estado a " + estado.name() +
+	                    ". Fecha: " + updateResult.getUpdateTime().toDate(),
+	            false
+	    );
 	}
 }

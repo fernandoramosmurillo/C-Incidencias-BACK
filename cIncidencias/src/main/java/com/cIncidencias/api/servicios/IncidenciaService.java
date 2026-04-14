@@ -2,6 +2,7 @@ package com.cIncidencias.api.servicios;
 
 import com.cIncidencias.api.modelos.Incidencia;
 import com.cIncidencias.api.modelos.Incidencia.EstadosIncidencia;
+import com.cIncidencias.api.modelos.ModeloBase;
 import com.cIncidencias.api.repositorios.IncidenciaRepository;
 import com.cIncidencias.api.excepciones.NullParamsException;
 import org.springframework.stereotype.Service;
@@ -107,5 +108,15 @@ public class IncidenciaService implements IGenericoService<Incidencia> {
 			throw new NullParamsException("Datos insuficientes para modificar la incidencia.");
 		}
 		incidenciaRepository.modificar(incidencia);
+	}
+	
+	@Override
+	public void cambiarEstado(String idIncidencia, ModeloBase.Estados estado) throws Exception {
+
+	    if (idIncidencia == null || idIncidencia.trim().isEmpty()) {
+	        throw new NullParamsException("Se necesita un ID válido para eliminar el comentario temporalmente.");
+	    }
+
+	    incidenciaRepository.cambiarEstado(idIncidencia, estado);
 	}
 }

@@ -9,14 +9,17 @@ public abstract class ModeloBase {
 
     protected Estados estado = Estados.ACTIVO;
 
-    /** Cambia el estado a ELIMINADO para permitir recuperación posterior. */
+    /**
+     * Marca la entidad como eliminada de forma temporal.
+     * No se borra de la base de datos, solo cambia su estado a ELIMINADO.
+     */
     public void eliminarTemporalmente() { this.estado = Estados.ELIMINADO; }
 
     /** Restaura el estado de la entidad a ACTIVO. */
     public void recuperar() { this.estado = Estados.ACTIVO; }
 
-    /** Cambia el estado a PENDIENTE para terminar formularios incompletos. */
-    public void ponerEnPendiente() { this.estado = Estados.EN_BORRADOR; }
+    /** Cambia el estado a EN_BORRADOR para terminar formularios incompletos. */
+    public void ponerEnBorrador() { this.estado = Estados.EN_BORRADOR; }
 
     /** @return El estado actual de la entidad. */
     public Estados getEstado() { return estado; }
@@ -24,15 +27,12 @@ public abstract class ModeloBase {
     /** @param estado El nuevo estado a asignar. */
     public void setEstado(Estados estado) { this.estado = estado; }
 
-	public ModeloBase(Estados estado) {
-		super();
-		this.estado = estado;
-	}
+    public ModeloBase(Estados estado) {
+        super();
+        this.estado = estado;
+    }
 
-	public ModeloBase() {
-		super();
-	}
-    
-	
-    
+    public ModeloBase() {
+        super();
+    }
 }

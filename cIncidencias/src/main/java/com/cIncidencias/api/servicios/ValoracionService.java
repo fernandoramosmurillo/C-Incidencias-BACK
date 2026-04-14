@@ -1,5 +1,6 @@
 package com.cIncidencias.api.servicios;
 
+import com.cIncidencias.api.modelos.ModeloBase;
 import com.cIncidencias.api.modelos.Valoracion;
 import com.cIncidencias.api.repositorios.ValoracionRepository;
 import com.cIncidencias.api.excepciones.NullParamsException;
@@ -102,5 +103,15 @@ public class ValoracionService implements IGenericoService<Valoracion> {
 			throw new NullParamsException("Datos insuficientes para modificar la valoración.");
 		}
 		valoracionRepository.modificar(valoracion);
+	}
+	
+	@Override
+	public void cambiarEstado(String idValoracion, ModeloBase.Estados estado) throws Exception {
+
+	    if (idValoracion == null || idValoracion.trim().isEmpty()) {
+	        throw new NullParamsException("Se necesita un ID válido para eliminar el comentario temporalmente.");
+	    }
+
+	    valoracionRepository.cambiarEstado(idValoracion, estado);
 	}
 }

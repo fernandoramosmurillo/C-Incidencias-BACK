@@ -111,4 +111,14 @@ public class NoticiaController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@PutMapping("/estado/eliminarTemporalmente/{id}")
+	public ResponseEntity<String> eliminarTemporalmente(@PathVariable String id) {
+	    try {
+	        noticiaService.eliminarTemporalmente(id);
+	        return new ResponseEntity<>("Noticia marcada como ELIMINADA", HttpStatus.OK);
+	    } catch (Exception e) {
+	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
+	}
 }

@@ -1,5 +1,6 @@
 package com.cIncidencias.api.servicios;
 
+import com.cIncidencias.api.modelos.ModeloBase;
 import com.cIncidencias.api.modelos.Noticia;
 import com.cIncidencias.api.repositorios.NoticiaRepository;
 import com.cIncidencias.api.excepciones.NullParamsException;
@@ -105,5 +106,15 @@ public class NoticiaService implements IGenericoService<Noticia> {
 			throw new NullParamsException("Datos insuficientes para modificar la noticia.");
 		}
 		noticiaRepository.modificar(noticia);
+	}
+	
+	@Override
+	public void cambiarEstado(String idNoticia, ModeloBase.Estados estado) throws Exception {
+
+	    if (idNoticia == null || idNoticia.trim().isEmpty()) {
+	        throw new NullParamsException("Se necesita un ID válido para eliminar el comentario temporalmente.");
+	    }
+
+	    noticiaRepository.cambiarEstado(idNoticia, estado);
 	}
 }

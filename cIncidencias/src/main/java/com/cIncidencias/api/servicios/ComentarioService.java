@@ -1,6 +1,7 @@
 package com.cIncidencias.api.servicios;
 
 import com.cIncidencias.api.modelos.Comentario;
+import com.cIncidencias.api.modelos.ModeloBase;
 import com.cIncidencias.api.repositorios.ComentarioRepository;
 import com.cIncidencias.api.excepciones.NullParamsException;
 import org.springframework.stereotype.Service;
@@ -68,5 +69,15 @@ public class ComentarioService implements IGenericoService<Comentario> {
         }
 
         comentarioRepository.modificar(comentario);
+    }
+    
+    @Override
+    public void cambiarEstado(String idComentario, ModeloBase.Estados estado) throws Exception {
+
+        if (idComentario == null || idComentario.trim().isEmpty()) {
+            throw new NullParamsException("Se necesita un ID válido para eliminar el comentario temporalmente.");
+        }
+
+        comentarioRepository.cambiarEstado(idComentario, estado);
     }
 }

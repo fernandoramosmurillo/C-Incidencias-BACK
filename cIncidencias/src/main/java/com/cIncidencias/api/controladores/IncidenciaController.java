@@ -102,8 +102,6 @@ public class IncidenciaController {
 		}
 	}
 	
-	
-
 	/**
 	 * Elimina una incidencia
 	 * DELETE /api/incidencias/{id}
@@ -117,4 +115,16 @@ public class IncidenciaController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	
+	@PutMapping("/estado/eliminarTemporalmente/{id}")
+	public ResponseEntity<String> eliminarTemporalmente(@PathVariable String id) {
+	    try {
+	        incidenciaService.eliminarTemporalmente(id);
+	        return new ResponseEntity<>("Incidencia marcada como ELIMINADA", HttpStatus.OK);
+	    } catch (Exception e) {
+	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
+	}
+	
 }

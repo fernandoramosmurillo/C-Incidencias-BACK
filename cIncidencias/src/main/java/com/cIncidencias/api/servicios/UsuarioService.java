@@ -1,5 +1,6 @@
 package com.cIncidencias.api.servicios;
 
+import com.cIncidencias.api.modelos.ModeloBase;
 import com.cIncidencias.api.modelos.Usuario;
 import com.cIncidencias.api.repositorios.UsuarioRepository;
 import com.cIncidencias.api.excepciones.NullParamsException;
@@ -105,5 +106,15 @@ public class UsuarioService implements IGenericoService<Usuario> {
 			throw new NullParamsException("Datos insuficientes para modificar el perfil de usuario.");
 		}
 		usuarioRepository.modificar(usuario);
+	}
+	
+	@Override
+	public void cambiarEstado(String idUsuario, ModeloBase.Estados estado) throws Exception {
+
+	    if (idUsuario == null || idUsuario.trim().isEmpty()) {
+	        throw new NullParamsException("Se necesita un ID válido para eliminar el comentario temporalmente.");
+	    }
+
+	    usuarioRepository.cambiarEstado(idUsuario, estado);
 	}
 }

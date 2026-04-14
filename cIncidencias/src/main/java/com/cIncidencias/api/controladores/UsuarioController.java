@@ -111,4 +111,14 @@ public class UsuarioController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@PutMapping("/estado/eliminarTemporalmente/{id}")
+	public ResponseEntity<String> eliminarTemporalmente(@PathVariable String id) {
+	    try {
+	        usuarioService.eliminarTemporalmente(id);
+	        return new ResponseEntity<>("Usuario marcado como ELIMINADO", HttpStatus.OK);
+	    } catch (Exception e) {
+	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
+	}
 }

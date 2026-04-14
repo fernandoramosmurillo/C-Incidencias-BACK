@@ -1,6 +1,7 @@
 package com.cIncidencias.api.repositorios;
 
 import com.cIncidencias.api.ficheros.ManejadorFicheros;
+import com.cIncidencias.api.modelos.ModeloBase;
 import com.cIncidencias.api.modelos.Usuario;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
@@ -16,8 +17,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Repositorio para la gestión de usuarios en Firestore.
- * Implementa IGenericoRepository para estandarizar la persistencia de ciudadanos y admins.
+ * Repositorio para la gestión de usuarios en Firestore. Implementa
+ * IGenericoRepository para estandarizar la persistencia de ciudadanos y admins.
  */
 @Repository
 public class UsuarioRepository implements IGenericoRepository<Usuario> {
@@ -40,9 +41,11 @@ public class UsuarioRepository implements IGenericoRepository<Usuario> {
 		}
 
 		// Añadido .toDate() para mostrar la hora local de España
-		ManejadorFicheros.escribir("logs/incidencias.log", "Usuario " + usuario.getNombre() + " "
-				+ usuario.getApellidos() + " guardado con éxito en Firestore. Fecha: " + result.get().getUpdateTime().toDate(),
-				false);
+		ManejadorFicheros
+				.escribir("logs/incidencias.log",
+						"Usuario " + usuario.getNombre() + " " + usuario.getApellidos()
+								+ " guardado con éxito en Firestore. Fecha: " + result.get().getUpdateTime().toDate(),
+						false);
 	}
 
 	@Override
@@ -79,11 +82,34 @@ public class UsuarioRepository implements IGenericoRepository<Usuario> {
 	public void modificar(Usuario usuario) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(usuario.getIdUsuario());
 		ApiFuture<WriteResult> result = docRef.set(usuario);
-		
+
 		// Cambiado a .toDate() para consistencia local
 		Object fechaActualizacion = result.get().getUpdateTime().toDate();
 
-		ManejadorFicheros.escribir("logs/incidencias.log","Usuario ID: " + usuario.getIdUsuario() + " [" + usuario.getNombre()
-				+ "] modificado correctamente. Fecha: " + fechaActualizacion, false);
+		ManejadorFicheros.escribir("logs/incidencias.log", "Usuario ID: " + usuario.getIdUsuario() + " ["
+				+ usuario.getNombre() + "] modificado correctamente. Fecha: " + fechaActualizacion, false);
 	}
+
+	@Override
+	public void cambiarEstado(String idUsuario, ModeloBase.Estados estado)
+	        throws InterruptedException, ExecutionException, IOException {
+
+	    DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idUsuario);
+
+	    ApiFuture<WriteResult> result = docRef.update("estado", estado.name());
+	    WriteResult updateResult = result.get();
+
+	    if (!archivoLog.exists()) {
+	        archivoLog.mkdirs();
+	    }
+
+	    ManejadorFicheros.escribir(
+	            "logs/incidencias.log",
+	            "Usuario ID: " + idUsuario +
+	                    " cambio de estado a " + estado.name() +
+	                    ". Fecha: " + updateResult.getUpdateTime().toDate(),
+	            false
+	    );
+	}
+
 }
