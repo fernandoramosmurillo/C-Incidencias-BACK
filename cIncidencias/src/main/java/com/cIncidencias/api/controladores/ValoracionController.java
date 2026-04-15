@@ -1,5 +1,6 @@
 package com.cIncidencias.api.controladores;
 
+import com.cIncidencias.api.modelos.ModeloBase;
 import com.cIncidencias.api.modelos.Valoracion;
 import com.cIncidencias.api.servicios.IGenericoService;
 import org.springframework.http.HttpStatus;
@@ -112,11 +113,15 @@ public class ValoracionController {
 		}
 	}
 	
-	@PutMapping("/estado/eliminarTemporalmente/{id}")
-	public ResponseEntity<String> eliminarTemporalmente(@PathVariable String id) {
+	/**
+	 * Cambia el estado de la valoración (ACTIVO, INACTIVO, ELIMINADO, etc.)
+	 * PUT /api/valoraciones/{id}/estado/{estado}
+	 */
+	@PutMapping("/{id}/estado/{estado}")
+	public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable ModeloBase.Estados estado) {
 	    try {
-	        valoracionService.eliminarTemporalmente(id);
-	        return new ResponseEntity<>("Valoración marcada como ELIMINADA", HttpStatus.OK);
+	        valoracionService.cambiarEstado(id, estado);
+	        return new ResponseEntity<>("Estado de la valoración actualizado a: " + estado, HttpStatus.OK);
 	    } catch (Exception e) {
 	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
