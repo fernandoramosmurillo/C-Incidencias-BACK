@@ -1,5 +1,6 @@
 package com.cIncidencias.api.modelos;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.cIncidencias.api.modelos.Serializadores.TimestampDeserializer;
@@ -38,7 +39,8 @@ public class Administrador extends Usuario {
 	private String claveAdmin; // Contraseña especial para las administradores
 
 	// Historial de noticias o bandos publicados por este administrador
-	private List<Noticia> listaNoticiasEnviadas;
+	// Inicializamos con ArrayList para evitar NullPointerException en el resto de la app
+	private List<Noticia> listaNoticiasEnviadas = new ArrayList<>();
 
 	public Administrador(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
 			String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
@@ -56,6 +58,8 @@ public class Administrador extends Usuario {
 		this.departamento = departamento;
 		this.fechaCambioClave = fechaCambioClave;
 		this.claveAdmin = claveAdmin;
-		this.listaNoticiasEnviadas = listaNoticiasEnviadas;
+		
+		// Validación para asegurar que la lista nunca sea null tras la construcción
+		this.listaNoticiasEnviadas = (listaNoticiasEnviadas != null) ? listaNoticiasEnviadas : new ArrayList<>();
 	}
 }

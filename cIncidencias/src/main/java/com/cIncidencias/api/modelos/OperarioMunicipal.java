@@ -1,5 +1,6 @@
 package com.cIncidencias.api.modelos;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.cIncidencias.api.modelos.Serializadores.DocumentReferenceDeserializer;
@@ -38,8 +39,8 @@ public class OperarioMunicipal extends Usuario {
     
     // Relación directa con las incidencias que tiene entre manos
     @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
-    @JsonSerialize(using = DocumentReferenceSerializer.class)
-    private List<DocumentReference> listaIncidenciasAsignadas;
+    @JsonSerialize(contentUsing = DocumentReferenceSerializer.class)
+    private List<DocumentReference> listaIncidenciasAsignadas = new ArrayList<>();
 
 	public OperarioMunicipal(Estados estado, String idUsuario, String nombre, String apellidos,
 			String correoElectronico, String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario,
@@ -56,6 +57,8 @@ public class OperarioMunicipal extends Usuario {
 		this.telefonoTrabajo = telefonoTrabajo;
 		this.numeroCuadrilla = numeroCuadrilla;
 		this.incidenciasResueltas = incidenciasResueltas;
-		this.listaIncidenciasAsignadas = listaIncidenciasAsignadas;
+        
+        // Si no hay incidencias asignadas todavía, se inicializa la lista vacía
+		this.listaIncidenciasAsignadas = (listaIncidenciasAsignadas != null) ? listaIncidenciasAsignadas : new ArrayList<>();
 	}
 }
