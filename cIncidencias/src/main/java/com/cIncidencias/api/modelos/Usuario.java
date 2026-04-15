@@ -1,5 +1,6 @@
 package com.cIncidencias.api.modelos;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.cIncidencias.api.modelos.Serializadores.TimestampDeserializer;
@@ -18,15 +19,14 @@ enum TiposAcceso { CORREO_CONTRASEÑA, GOOGLE, CLAVE_ADMIN }
 
 @Data // Genera los Getters y Setters para mantener el código más limpio y ordenado
 @NoArgsConstructor
-
 public class Usuario extends ModeloBase {
     
     // Identificadores y datos de contacto del perfil
     protected String idUsuario;          // Identificador único del registro
-    protected String nombre;             // Nombre del usuario
+    protected String nombre;               // Nombre del usuario
     protected String apellidos;          // Apellidos del usuario
     protected String correoElectronico;  // Dirección de correo principal
-    protected String clave;              // Credencial de acceso al sistema
+    protected String clave;               // Credencial de acceso al sistema
     
     // Al igual que en otras clases, se utilizan Timestamps de Google para las fechas
     @JsonSerialize(using = TimestampSerializer.class)
@@ -50,7 +50,7 @@ public class Usuario extends ModeloBase {
     protected Timestamp fechaEliminacion; 
     
     // Registro histórico de las comunicaciones enviadas al usuario
-    protected List<Notificacion> notificacionesRecibidas;
+    protected List<Notificacion> notificacionesRecibidas = new ArrayList<>();
 
 	public Usuario(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
 			String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
@@ -70,6 +70,8 @@ public class Usuario extends ModeloBase {
 		this.recibirNotificaciones = recibirNotificaciones;
 		this.fechaCreacion = fechaCreacion;
 		this.fechaEliminacion = fechaEliminacion;
-		this.notificacionesRecibidas = notificacionesRecibidas;
+        
+        // Si el listado viene nulo de la base de datos, lo inicializamos vacío
+		this.notificacionesRecibidas = (notificacionesRecibidas != null) ? notificacionesRecibidas : new ArrayList<>();
 	}
 }
