@@ -1,5 +1,6 @@
 package com.cIncidencias.api.controladores;
 
+import com.cIncidencias.api.modelos.ModeloBase;
 import com.cIncidencias.api.modelos.Usuario;
 import com.cIncidencias.api.servicios.IGenericoService;
 import org.springframework.http.HttpStatus;
@@ -112,11 +113,15 @@ public class UsuarioController {
 		}
 	}
 	
-	@PutMapping("/estado/eliminarTemporalmente/{id}")
-	public ResponseEntity<String> eliminarTemporalmente(@PathVariable String id) {
+	/**
+	 * Cambia el estado del perfil de usuario (ACTIVO, INACTIVO, ELIMINADO, etc.)
+	 * PUT /api/usuarios/{id}/estado/{estado}
+	 */
+	@PutMapping("/{id}/estado/{estado}")
+	public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable ModeloBase.Estados estado) {
 	    try {
-	        usuarioService.eliminarTemporalmente(id);
-	        return new ResponseEntity<>("Usuario marcado como ELIMINADO", HttpStatus.OK);
+	        usuarioService.cambiarEstado(id, estado);
+	        return new ResponseEntity<>("Estado del usuario actualizado a: " + estado, HttpStatus.OK);
 	    } catch (Exception e) {
 	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	    }

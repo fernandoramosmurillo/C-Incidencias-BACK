@@ -1,6 +1,7 @@
 package com.cIncidencias.api.controladores;
 
 import com.cIncidencias.api.modelos.Incidencia;
+import com.cIncidencias.api.modelos.ModeloBase;
 import com.cIncidencias.api.servicios.IGenericoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -117,11 +118,15 @@ public class IncidenciaController {
 	}
 	
 	
-	@PutMapping("/estado/eliminarTemporalmente/{id}")
-	public ResponseEntity<String> eliminarTemporalmente(@PathVariable String id) {
+	/**
+	 * Cambia el estado de la incidencia (Activo, Inactivo, Eliminado, etc.)
+	 * PUT /api/incidencias/{id}/estado/{estado}
+	 */
+	@PutMapping("/{id}/estado/{estado}")
+	public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable ModeloBase.Estados estado) {
 	    try {
-	        incidenciaService.eliminarTemporalmente(id);
-	        return new ResponseEntity<>("Incidencia marcada como ELIMINADA", HttpStatus.OK);
+	        incidenciaService.cambiarEstado(id, estado);
+	        return new ResponseEntity<>("Estado de la incidencia actualizado a: " + estado, HttpStatus.OK);
 	    } catch (Exception e) {
 	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
