@@ -3,6 +3,8 @@ package com.cIncidencias.api.modelos;
 import java.util.ArrayList;
 import java.util.List;
 import com.google.cloud.Timestamp;
+import com.google.cloud.firestore.DocumentReference;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -23,7 +25,7 @@ public class Ciudadano extends Usuario {
     public Ciudadano(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
             String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
             TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion,
-            Timestamp fechaEliminacion, List<Notificacion> notificacionesRecibidas, String dni,
+            Timestamp fechaEliminacion, List<DocumentReference> notificacionesRecibidas, String dni,
             Integer telefonoContacto, String direccion, List<Incidencia> incidenciasSolicitadas,
             List<Incidencia> incidenciasCalificadas) {
         

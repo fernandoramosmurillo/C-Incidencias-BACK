@@ -45,7 +45,7 @@ public class OperarioMunicipal extends Usuario {
 	public OperarioMunicipal(Estados estado, String idUsuario, String nombre, String apellidos,
 			String correoElectronico, String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario,
 			String fotoPerfilUrl, TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones,
-			Timestamp fechaCreacion, Timestamp fechaEliminacion, List<Notificacion> notificacionesRecibidas,
+			Timestamp fechaCreacion, Timestamp fechaEliminacion, List<DocumentReference> notificacionesRecibidas,
 			Especialidades especialidad, Boolean disponible, Boolean carnetConducir, String telefonoTrabajo,
 			Integer numeroCuadrilla, Integer incidenciasResueltas, List<DocumentReference> listaIncidenciasAsignadas) {
 		super(estado, idUsuario, nombre, apellidos, correoElectronico, clave, fechaNacimiento, rolUsuario,
