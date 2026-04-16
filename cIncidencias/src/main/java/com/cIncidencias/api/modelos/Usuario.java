@@ -3,12 +3,17 @@ package com.cIncidencias.api.modelos;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.cIncidencias.api.modelos.Serializadores.DocumentReferenceDeserializer;
+import com.cIncidencias.api.modelos.Serializadores.DocumentReferenceSerializer;
 import com.cIncidencias.api.modelos.Serializadores.TimestampDeserializer;
 import com.cIncidencias.api.modelos.Serializadores.TimestampSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.Timestamp;
+import com.google.cloud.firestore.DocumentReference;
+
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
@@ -19,6 +24,7 @@ enum TiposAcceso { CORREO_CONTRASEÑA, GOOGLE, CLAVE_ADMIN }
 
 @Data // Genera los Getters y Setters para mantener el código más limpio y ordenado
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Usuario extends ModeloBase {
     
     // Identificadores y datos de contacto del perfil
@@ -45,17 +51,20 @@ public class Usuario extends ModeloBase {
     @JsonSerialize(using = TimestampSerializer.class)
     @JsonDeserialize(using = TimestampDeserializer.class)
     protected Timestamp fechaCreacion;
+    
     @JsonSerialize(using = TimestampSerializer.class)
     @JsonDeserialize(using = TimestampDeserializer.class)
     protected Timestamp fechaEliminacion; 
     
     // Registro histórico de las comunicaciones enviadas al usuario
-    protected List<Notificacion> notificacionesRecibidas = new ArrayList<>();
+    @JsonSerialize(contentUsing = DocumentReferenceSerializer.class)
+    @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
+    protected List<DocumentReference> notificacionesRecibidas = new ArrayList<>();
 
 	public Usuario(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
 			String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
 			TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion,
-			Timestamp fechaEliminacion, List<Notificacion> notificacionesRecibidas) {
+			Timestamp fechaEliminacion, List<DocumentReference> notificacionesRecibidas) {
 		super(estado);
 		this.idUsuario = idUsuario;
 		this.nombre = nombre;

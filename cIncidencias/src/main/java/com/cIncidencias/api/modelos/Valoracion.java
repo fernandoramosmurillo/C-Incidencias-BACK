@@ -6,10 +6,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.Timestamp;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data // Getters y Setters automáticos para mantener el código limpio
+@EqualsAndHashCode(callSuper = true)
 public class Valoracion extends ModeloBase{
 
     private String idValoracion;      // El identificador único de la reseña

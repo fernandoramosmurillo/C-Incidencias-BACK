@@ -67,12 +67,15 @@ public class Incidencia extends ModeloBase {
     // Atributos de categorización propios de la incidencia
     private Prioridades prioridad;
     private EstadosIncidencia estadoIncidencia = EstadosIncidencia.ABIERTA; // Estado inicial por defecto
-    private Valoracion valoracion; // Calificación final que otorga el ciudadano
+    
+    @JsonDeserialize(using = DocumentReferenceDeserializer.class)
+    @JsonSerialize(using = DocumentReferenceSerializer.class)
+    private DocumentReference valoracion;
     
     public Incidencia(String idIncidencia, String nombre, String descripcion, GeoPoint ubicacion, String imagenUrl,
             Timestamp fechaCreacion, Timestamp fechaCierre, DocumentReference usuarioCiudadano,
             TreeMap<String, DocumentReference> listaOperarios, List<DocumentReference> comentarios, Prioridades prioridad,
-            EstadosIncidencia estadoIncidencia, Valoracion valoracion) {
+            EstadosIncidencia estadoIncidencia, DocumentReference valoracion) {
         super(); // Llama al constructor de ModeloBase para mantener la jerarquía
         this.idIncidencia = idIncidencia;
         this.titulo = nombre;

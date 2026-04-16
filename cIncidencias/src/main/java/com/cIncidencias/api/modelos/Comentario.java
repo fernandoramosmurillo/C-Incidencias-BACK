@@ -10,10 +10,12 @@ import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data // Getters y Setters automáticos para mantener el código limpio y ordenado
+@EqualsAndHashCode(callSuper = true)
 public class Comentario extends ModeloBase {
 
     private String idComentario;      // El identificador único de cada mensaje

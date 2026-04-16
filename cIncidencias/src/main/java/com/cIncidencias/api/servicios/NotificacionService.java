@@ -43,7 +43,7 @@ public class NotificacionService implements IGenericoService<Notificacion> {
 		}
 		
 		// Se verifica que tiene un usuario de destino
-		if (notificacion.getIdDestinatario() == null || notificacion.getIdDestinatario().size() < 1) {
+		if (notificacion.getIdDestinatarios() == null || notificacion.getIdDestinatarios().size() < 1) {
 			throw new NullParamsException("La notificación debe tener un usuario de destino.");
 		}
 
