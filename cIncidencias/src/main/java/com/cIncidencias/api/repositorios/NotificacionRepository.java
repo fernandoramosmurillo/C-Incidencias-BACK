@@ -2,8 +2,10 @@ package com.cIncidencias.api.repositorios;
 
 import com.cIncidencias.api.ficheros.ManejadorFicheros;
 import com.cIncidencias.api.modelos.ModeloBase;
+import com.cIncidencias.api.modelos.ModeloBase.Estados;
 import com.cIncidencias.api.modelos.Notificacion;
 import com.google.api.core.ApiFuture;
+import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
@@ -92,9 +94,20 @@ public class NotificacionRepository implements IGenericoRepository<Notificacion>
 	        throws InterruptedException, ExecutionException, IOException {
 
 	    DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idNotificacion);
-
-	    ApiFuture<WriteResult> result = docRef.update("estado", estado.name());
-	    WriteResult updateResult = result.get();
+	    WriteResult updateResult = null;
+	    
+	    if (!estado.equals(Estados.ELIMINADO)) {
+	        // Cambio de estado normal para la notificación
+	        ApiFuture<WriteResult> result = docRef.update("estado", estado.name());
+		    updateResult = result.get();
+	    } else {
+	        // Si eliminamos la notificación, guardamos el estado y la fecha de borrado a la vez
+	        ApiFuture<WriteResult> result = docRef.update(
+	    			"estado", estado.name(),
+	    			"fechaEliminacion", Timestamp.now()
+	    	);
+		    updateResult = result.get();
+	    }
 
 	    if (!archivoLog.exists()) {
 	        archivoLog.mkdirs();
