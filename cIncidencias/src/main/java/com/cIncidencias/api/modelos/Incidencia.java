@@ -59,7 +59,7 @@ public class Incidencia extends ModeloBase {
     
     @JsonSerialize(contentUsing = DocumentReferenceSerializer.class)
     @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
-    private Map<String, DocumentReference> listaOperarios = new TreeMap<>(); // Diccionario de técnicos asignados para evitar nulos
+    private List<DocumentReference> listaOperarios = new ArrayList<>(); // Diccionario de técnicos asignados para evitar nulos
     
     @JsonSerialize(contentUsing = DocumentReferenceSerializer.class)
     @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
@@ -75,7 +75,7 @@ public class Incidencia extends ModeloBase {
     
     public Incidencia(String idIncidencia, String titulo, String descripcion, GeoPoint ubicacion, String imagenUrl,
             Timestamp fechaCreacion, Timestamp fechaCierre, DocumentReference usuarioCiudadano,
-            Map<String, DocumentReference> listaOperarios, List<DocumentReference> comentarios, Prioridades prioridad,
+            List<DocumentReference> listaOperarios, List<DocumentReference> comentarios, Prioridades prioridad,
             EstadosIncidencia estadoIncidencia, DocumentReference valoracion) {
         super(); // Llama al constructor de ModeloBase para mantener la jerarquía
         this.idIncidencia = idIncidencia;
@@ -88,7 +88,7 @@ public class Incidencia extends ModeloBase {
         this.usuarioCiudadano = usuarioCiudadano;
         
         // Si Firebase nos devuelve un nulo en las colecciones, las inicializamos vacías
-        this.listaOperarios = (listaOperarios != null) ? listaOperarios : new TreeMap<>();
+        this.listaOperarios = (listaOperarios != null) ? listaOperarios : new ArrayList<>();
         this.comentarios = (comentarios != null) ? comentarios : new ArrayList<>();
         
         this.prioridad = prioridad;
