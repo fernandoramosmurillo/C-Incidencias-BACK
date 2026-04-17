@@ -2,6 +2,7 @@ package com.cIncidencias.api.modelos;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import com.cIncidencias.api.modelos.Serializadores.DocumentReferenceDeserializer;
@@ -58,7 +59,7 @@ public class Incidencia extends ModeloBase {
     
     @JsonSerialize(contentUsing = DocumentReferenceSerializer.class)
     @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
-    private TreeMap<String, DocumentReference> listaOperarios = new TreeMap<>(); // Diccionario de técnicos asignados para evitar nulos
+    private Map<String, DocumentReference> listaOperarios = new TreeMap<>(); // Diccionario de técnicos asignados para evitar nulos
     
     @JsonSerialize(contentUsing = DocumentReferenceSerializer.class)
     @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
@@ -72,13 +73,13 @@ public class Incidencia extends ModeloBase {
     @JsonSerialize(using = DocumentReferenceSerializer.class)
     private DocumentReference valoracion;
     
-    public Incidencia(String idIncidencia, String nombre, String descripcion, GeoPoint ubicacion, String imagenUrl,
+    public Incidencia(String idIncidencia, String titulo, String descripcion, GeoPoint ubicacion, String imagenUrl,
             Timestamp fechaCreacion, Timestamp fechaCierre, DocumentReference usuarioCiudadano,
-            TreeMap<String, DocumentReference> listaOperarios, List<DocumentReference> comentarios, Prioridades prioridad,
+            Map<String, DocumentReference> listaOperarios, List<DocumentReference> comentarios, Prioridades prioridad,
             EstadosIncidencia estadoIncidencia, DocumentReference valoracion) {
         super(); // Llama al constructor de ModeloBase para mantener la jerarquía
         this.idIncidencia = idIncidencia;
-        this.titulo = nombre;
+        this.titulo = titulo;
         this.descripcion = descripcion;
         this.ubicacion = ubicacion;
         this.imagenUrl = imagenUrl;

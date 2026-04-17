@@ -14,6 +14,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/notificaciones")
+@CrossOrigin(origins = "*")
 public class NotificacionController {
 
 	private final IGenericoService<Notificacion> notificacionService;
@@ -32,6 +33,7 @@ public class NotificacionController {
 			List<Notificacion> lista = notificacionService.obtenerTodos();
 			return new ResponseEntity<>(lista, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -48,6 +50,7 @@ public class NotificacionController {
 					? new ResponseEntity<>(notificacion, HttpStatus.OK) 
 					: new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -62,6 +65,7 @@ public class NotificacionController {
 			notificacionService.guardar(notificacion);
 			return new ResponseEntity<>("Notificación enviada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -80,6 +84,7 @@ public class NotificacionController {
 			}
 			return new ResponseEntity<>("Carga masiva de notificaciones completada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -94,6 +99,7 @@ public class NotificacionController {
 			notificacionService.modificar(notificacion);
 			return new ResponseEntity<>("Notificación actualizada correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -108,6 +114,7 @@ public class NotificacionController {
 			notificacionService.eliminar(id);
 			return new ResponseEntity<>("Notificación eliminada", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

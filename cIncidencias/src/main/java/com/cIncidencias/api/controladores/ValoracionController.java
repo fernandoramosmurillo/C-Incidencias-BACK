@@ -15,6 +15,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/valoraciones")
+@CrossOrigin(origins = "*")
 public class ValoracionController {
 
 	private final IGenericoService<Valoracion> valoracionService;
@@ -33,6 +34,7 @@ public class ValoracionController {
 			List<Valoracion> lista = valoracionService.obtenerTodos();
 			return new ResponseEntity<>(lista, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -49,6 +51,7 @@ public class ValoracionController {
 					? new ResponseEntity<>(valoracion, HttpStatus.OK) 
 					: new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -63,6 +66,7 @@ public class ValoracionController {
 			valoracionService.guardar(valoracion);
 			return new ResponseEntity<>("Valoración registrada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -81,6 +85,7 @@ public class ValoracionController {
 			}
 			return new ResponseEntity<>("Carga masiva de valoraciones completada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -95,6 +100,7 @@ public class ValoracionController {
 			valoracionService.modificar(valoracion);
 			return new ResponseEntity<>("Valoración actualizada correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -109,6 +115,7 @@ public class ValoracionController {
 			valoracionService.eliminar(id);
 			return new ResponseEntity<>("Valoración eliminada correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -123,6 +130,7 @@ public class ValoracionController {
 	        valoracionService.cambiarEstado(id, estado);
 	        return new ResponseEntity<>("Estado de la valoración actualizado a: " + estado, HttpStatus.OK);
 	    } catch (Exception e) {
+	    	e.printStackTrace();
 	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 	}
