@@ -15,6 +15,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/comentarios")
+@CrossOrigin(origins = "*")
 public class ComentarioController {
 
 	private final IGenericoService<Comentario> comentarioService;
@@ -32,6 +33,7 @@ public class ComentarioController {
 			List<Comentario> lista = comentarioService.obtenerTodos();
 			return new ResponseEntity<>(lista, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -46,6 +48,7 @@ public class ComentarioController {
 			return (comentario != null) ? new ResponseEntity<>(comentario, HttpStatus.OK)
 					: new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -59,6 +62,7 @@ public class ComentarioController {
 			comentarioService.guardar(comentario);
 			return new ResponseEntity<>("Comentario registrado con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -75,6 +79,7 @@ public class ComentarioController {
 			}
 			return new ResponseEntity<>("Lista de comentarios registrada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -88,6 +93,7 @@ public class ComentarioController {
 			comentarioService.modificar(comentario);
 			return new ResponseEntity<>("Comentario actualizado correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -101,6 +107,7 @@ public class ComentarioController {
 			comentarioService.eliminar(id);
 			return new ResponseEntity<>("Comentario eliminado", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -114,6 +121,7 @@ public class ComentarioController {
 	        comentarioService.cambiarEstado(id, estado);
 	        return new ResponseEntity<>("Estado del comentario actualizado a: " + estado, HttpStatus.OK);
 	    } catch (Exception e) {
+	    	e.printStackTrace();
 	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 	}

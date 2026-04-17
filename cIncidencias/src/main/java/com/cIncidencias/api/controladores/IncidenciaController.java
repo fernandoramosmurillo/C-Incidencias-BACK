@@ -15,6 +15,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/incidencias")
+@CrossOrigin(origins = "*")
 public class IncidenciaController {
 
 	private final IGenericoService<Incidencia> incidenciaService;
@@ -33,6 +34,7 @@ public class IncidenciaController {
 			List<Incidencia> lista = incidenciaService.obtenerTodos();
 			return new ResponseEntity<>(lista, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -49,6 +51,7 @@ public class IncidenciaController {
 					? new ResponseEntity<>(incidencia, HttpStatus.OK) 
 					: new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -63,6 +66,7 @@ public class IncidenciaController {
 			incidenciaService.guardar(incidencia);
 			return new ResponseEntity<>("Incidencia registrada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -84,6 +88,7 @@ public class IncidenciaController {
 			}
 			return new ResponseEntity<>("Incidencia registrada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -99,6 +104,7 @@ public class IncidenciaController {
 			incidenciaService.modificar(incidencia);
 			return new ResponseEntity<>("Incidencia actualizada correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -113,6 +119,7 @@ public class IncidenciaController {
 			incidenciaService.eliminar(id);
 			return new ResponseEntity<>("Incidencia eliminada", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -128,6 +135,7 @@ public class IncidenciaController {
 	        incidenciaService.cambiarEstado(id, estado);
 	        return new ResponseEntity<>("Estado de la incidencia actualizado a: " + estado, HttpStatus.OK);
 	    } catch (Exception e) {
+	    	e.printStackTrace();
 	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 	}

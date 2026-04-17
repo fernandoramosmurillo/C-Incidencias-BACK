@@ -15,6 +15,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/usuarios")
+@CrossOrigin(origins = "*")
 public class UsuarioController {
 
 	private final IGenericoService<Usuario> usuarioService;
@@ -33,6 +34,7 @@ public class UsuarioController {
 			List<Usuario> lista = usuarioService.obtenerTodos();
 			return new ResponseEntity<>(lista, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -49,6 +51,7 @@ public class UsuarioController {
 					? new ResponseEntity<>(usuario, HttpStatus.OK) 
 					: new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -63,6 +66,7 @@ public class UsuarioController {
 			usuarioService.guardar(usuario);
 			return new ResponseEntity<>("Usuario registrado con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -81,6 +85,7 @@ public class UsuarioController {
 			}
 			return new ResponseEntity<>("Carga masiva de usuarios completada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -95,6 +100,7 @@ public class UsuarioController {
 			usuarioService.modificar(usuario);
 			return new ResponseEntity<>("Perfil de usuario actualizado correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -109,6 +115,7 @@ public class UsuarioController {
 			usuarioService.eliminar(id);
 			return new ResponseEntity<>("Usuario eliminado correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -123,6 +130,7 @@ public class UsuarioController {
 	        usuarioService.cambiarEstado(id, estado);
 	        return new ResponseEntity<>("Estado del usuario actualizado a: " + estado, HttpStatus.OK);
 	    } catch (Exception e) {
+	    	e.printStackTrace();
 	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 	}

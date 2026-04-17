@@ -15,6 +15,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/noticias")
+@CrossOrigin(origins = "*")
 public class NoticiaController {
 
 	private final IGenericoService<Noticia> noticiaService;
@@ -33,6 +34,7 @@ public class NoticiaController {
 			List<Noticia> lista = noticiaService.obtenerTodos();
 			return new ResponseEntity<>(lista, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -49,6 +51,7 @@ public class NoticiaController {
 					? new ResponseEntity<>(noticia, HttpStatus.OK) 
 					: new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -63,6 +66,7 @@ public class NoticiaController {
 			noticiaService.guardar(noticia);
 			return new ResponseEntity<>("Noticia publicada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -81,6 +85,7 @@ public class NoticiaController {
 			}
 			return new ResponseEntity<>("Carga masiva de noticias registrada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -95,6 +100,7 @@ public class NoticiaController {
 			noticiaService.modificar(noticia);
 			return new ResponseEntity<>("Noticia actualizada correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -109,6 +115,7 @@ public class NoticiaController {
 			noticiaService.eliminar(id);
 			return new ResponseEntity<>("Noticia eliminada correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -123,6 +130,7 @@ public class NoticiaController {
 	        noticiaService.cambiarEstado(id, estado);
 	        return new ResponseEntity<>("Estado de la noticia actualizado a: " + estado, HttpStatus.OK);
 	    } catch (Exception e) {
+	    	e.printStackTrace();
 	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 	}
