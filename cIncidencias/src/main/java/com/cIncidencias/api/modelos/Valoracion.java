@@ -6,10 +6,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.Timestamp;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data // Getters y Setters automáticos para mantener el código limpio
+@EqualsAndHashCode(callSuper = true)
 public class Valoracion extends ModeloBase{
 
     private String idValoracion;      // El identificador único de la reseña
@@ -21,6 +23,11 @@ public class Valoracion extends ModeloBase{
     @JsonDeserialize(using = TimestampDeserializer.class)
     private Timestamp fechaPublicacion;
 
+    /**
+     * Constructor para crear una valoración detallada.
+     * Registra el feedback del ciudadano tras cerrar una incidencia, incluyendo 
+     * la nota numérica y el comentario que servirá para medir la calidad del servicio.
+     */
 	public Valoracion(Estados estado, String idValoracion, String nombre, String opinion, Integer puntuacionP,
 			Timestamp fechaPublicacion) {
 		super(estado);

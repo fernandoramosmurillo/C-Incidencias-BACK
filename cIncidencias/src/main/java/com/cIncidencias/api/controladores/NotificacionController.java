@@ -14,17 +14,21 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/notificaciones")
+@CrossOrigin(origins = "*")
 public class NotificacionController {
 
 	private final IGenericoService<Notificacion> notificacionService;
 
+	/**
+	 * Constructor para inyectar el servicio. Spring se encarga de todo el lío.
+	 */
 	public NotificacionController(IGenericoService<Notificacion> notificacionService) {
 		this.notificacionService = notificacionService;
 	}
 
 	/**
-	 * Obtiene todas las notificaciones registradas.
-	 * GET /api/notificaciones
+	 * Recupera todas las notificaciones del sistema. 
+	 * Se usa sobre todo para que los administradores vean el histórico de avisos.
 	 */
 	@GetMapping
 	public ResponseEntity<List<Notificacion>> listar() {
@@ -32,13 +36,13 @@ public class NotificacionController {
 			List<Notificacion> lista = notificacionService.obtenerTodos();
 			return new ResponseEntity<>(lista, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	/**
-	 * Busca una notificación por su ID.
-	 * GET /api/notificaciones/{id}
+	 * Busca un aviso concreto por su ID para ver los detalles.
 	 */
 	@GetMapping("/{id}")
 	public ResponseEntity<Notificacion> obtenerPorId(@PathVariable("id") String id) {
@@ -48,13 +52,13 @@ public class NotificacionController {
 					? new ResponseEntity<>(notificacion, HttpStatus.OK) 
 					: new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	/**
-	 * Envía/Guarda una nueva notificación.
-	 * POST /api/notificaciones
+	 * Lanza una nueva notificación. Se usa para avisar a los vecinos o a los técnicos.
 	 */
 	@PostMapping
 	public ResponseEntity<String> guardar(@RequestBody Notificacion notificacion) {
@@ -62,15 +66,14 @@ public class NotificacionController {
 			notificacionService.guardar(notificacion);
 			return new ResponseEntity<>("Notificación enviada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	/**
-	 * ¡Advertencia!
-	 * Este método solo debe usarse durante las pruebas y desarrollo.
-	 * * Registra una lista de notificaciones de forma masiva.
-	 * POST /api/notificaciones/guardarLista
+	 * ¡Advertencia! Este método es solo para meter datos de prueba rápido.
+	 * Registra una lista de notificaciones de forma masiva.
 	 */
 	@PostMapping("/guardarLista")
 	public ResponseEntity<String> guardarLista(@RequestBody List<Notificacion> listaNotificaciones) {
@@ -80,13 +83,13 @@ public class NotificacionController {
 			}
 			return new ResponseEntity<>("Carga masiva de notificaciones completada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	/**
-	 * Modifica una notificación (ej. para marcarla como leída).
-	 * PUT /api/notificaciones
+	 * Sirve para retocar una notificación, como cuando queremos cambiar un texto o estado.
 	 */
 	@PutMapping
 	public ResponseEntity<String> modificar(@RequestBody Notificacion notificacion) {
@@ -94,13 +97,13 @@ public class NotificacionController {
 			notificacionService.modificar(notificacion);
 			return new ResponseEntity<>("Notificación actualizada correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	/**
-	 * Elimina una notificación del sistema.
-	 * DELETE /api/notificaciones/{id}
+	 * Borra el aviso del sistema definitivamente usando su identificador.
 	 */
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> eliminar(@PathVariable("id") String id) {
@@ -108,6 +111,7 @@ public class NotificacionController {
 			notificacionService.eliminar(id);
 			return new ResponseEntity<>("Notificación eliminada", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

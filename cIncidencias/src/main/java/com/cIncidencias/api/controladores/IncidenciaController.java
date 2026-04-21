@@ -15,16 +15,20 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/incidencias")
+@CrossOrigin(origins = "*")
 public class IncidenciaController {
 
 	private final IGenericoService<Incidencia> incidenciaService;
 
+	/**
+	 * Constructor para inyectar el servicio de incidencias.
+	 */
 	public IncidenciaController(IGenericoService<Incidencia> incidenciaService) {
 		this.incidenciaService = incidenciaService;
 	}
 
 	/**
-	 * Obtiene el listado de todas las incidencias reportadas.
+	 * Devuelve la lista completa de todas las incidencias que hay en la base de datos.
 	 * GET /api/incidencias
 	 */
 	@GetMapping
@@ -33,12 +37,13 @@ public class IncidenciaController {
 			List<Incidencia> lista = incidenciaService.obtenerTodos();
 			return new ResponseEntity<>(lista, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	/**
-	 * Busca una incidencia por su ID.
+	 * Busca una incidencia concreta usando su ID único.
 	 * GET /api/incidencias/{id}
 	 */
 	@GetMapping("/{id}")
@@ -49,12 +54,13 @@ public class IncidenciaController {
 					? new ResponseEntity<>(incidencia, HttpStatus.OK) 
 					: new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	/**
-	 * Crea una nueva incidencia
+	 * Registra una nueva incidencia en el sistema.
 	 * POST /api/incidencias
 	 */
 	@PostMapping
@@ -63,19 +69,16 @@ public class IncidenciaController {
 			incidenciaService.guardar(incidencia);
 			return new ResponseEntity<>("Incidencia registrada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	
 	/**
-	 * ¡Advertencia!
-	 * Este metodo solo debe usarse durante las pruebas y desarollo
-	 * 
-	 * Crea una nueva incidencia
+	 * ¡Ojo! Este método es solo para cargar datos de bulto en pruebas y desarrollo.
 	 * POST /api/incidencias/guardarLista
 	 */
-	
 	@PostMapping("/guardarLista")
 	public ResponseEntity<String> guardarLista(@RequestBody List<Incidencia> listaIncidencias){
 		try {
@@ -84,13 +87,14 @@ public class IncidenciaController {
 			}
 			return new ResponseEntity<>("Incidencia registrada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 	
 	
 	/**
-	 * Actualiza los datos de una incidencia existente (ej. cambiar el estado).
+	 * Permite modificar los datos de una incidencia que ya existe.
 	 * PUT /api/incidencias
 	 */
 	@PutMapping
@@ -99,12 +103,13 @@ public class IncidenciaController {
 			incidenciaService.modificar(incidencia);
 			return new ResponseEntity<>("Incidencia actualizada correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 	
 	/**
-	 * Elimina una incidencia
+	 * Borra el registro de una incidencia por su ID.
 	 * DELETE /api/incidencias/{id}
 	 */
 	@DeleteMapping("/{id}")
@@ -113,13 +118,14 @@ public class IncidenciaController {
 			incidenciaService.eliminar(id);
 			return new ResponseEntity<>("Incidencia eliminada", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
 	
 	/**
-	 * Cambia el estado de la incidencia (Activo, Inactivo, Eliminado, etc.)
+	 * Actualiza el estado lógico (Activo, Eliminado, etc.) sin borrar los datos del servidor.
 	 * PUT /api/incidencias/{id}/estado/{estado}
 	 */
 	@PutMapping("/{id}/estado/{estado}")
@@ -128,6 +134,7 @@ public class IncidenciaController {
 	        incidenciaService.cambiarEstado(id, estado);
 	        return new ResponseEntity<>("Estado de la incidencia actualizado a: " + estado, HttpStatus.OK);
 	    } catch (Exception e) {
+	    	e.printStackTrace();
 	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 	}

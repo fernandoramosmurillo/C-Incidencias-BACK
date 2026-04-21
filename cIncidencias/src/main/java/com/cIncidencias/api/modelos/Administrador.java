@@ -3,11 +3,15 @@ package com.cIncidencias.api.modelos;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.cIncidencias.api.modelos.Serializadores.DocumentReferenceDeserializer;
+import com.cIncidencias.api.modelos.Serializadores.DocumentReferenceSerializer;
 import com.cIncidencias.api.modelos.Serializadores.TimestampDeserializer;
 import com.cIncidencias.api.modelos.Serializadores.TimestampSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.Timestamp;
+import com.google.cloud.firestore.DocumentReference;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -40,14 +44,21 @@ public class Administrador extends Usuario {
 
 	// Historial de noticias o bandos publicados por este administrador
 	// Inicializamos con ArrayList para evitar NullPointerException en el resto de la app
-	private List<Noticia> listaNoticiasEnviadas = new ArrayList<>();
+	@JsonSerialize(contentUsing = DocumentReferenceSerializer.class)
+	@JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
+	private List<DocumentReference> listaNoticiasEnviadas = new ArrayList<>();
 
+	/**
+	 * Constructor completo para crear un administrador con todos sus permisos y datos de seguridad.
+	 * He incluido la validación al final para que la lista de noticias nunca nos llegue como null 
+	 * y no nos rompa la ejecución más adelante.
+	 */
 	public Administrador(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
 			String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
 			TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion,
-			Timestamp fechaEliminacion, List<Notificacion> notificacionesRecibidas, Integer nivelAcceso,
+			Timestamp fechaEliminacion, List<DocumentReference> notificacionesRecibidas, Integer nivelAcceso,
 			Integer intentosPushDenegados, Boolean esSuperAdmin, String firmaDigitalId, Departamentos departamento,
-			Timestamp fechaCambioClave, String claveAdmin, List<Noticia> listaNoticiasEnviadas) {
+			Timestamp fechaCambioClave, String claveAdmin, List<DocumentReference> listaNoticiasEnviadas) {
 		super(estado, idUsuario, nombre, apellidos, correoElectronico, clave, fechaNacimiento, rolUsuario,
 				fotoPerfilUrl, tipoAcceso, bloqueado, recibirNotificaciones, fechaCreacion, fechaEliminacion,
 				notificacionesRecibidas);

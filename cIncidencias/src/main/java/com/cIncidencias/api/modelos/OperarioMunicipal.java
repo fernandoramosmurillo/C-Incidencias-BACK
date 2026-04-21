@@ -42,10 +42,16 @@ public class OperarioMunicipal extends Usuario {
     @JsonSerialize(contentUsing = DocumentReferenceSerializer.class)
     private List<DocumentReference> listaIncidenciasAsignadas = new ArrayList<>();
 
+    /**
+     * Constructor para dar de alta a un operario con su perfil laboral completo.
+     * He mantenido la validación al final para que la lista de incidencias asignadas 
+     * nunca llegue como null; así, si el operario es nuevo y no tiene tareas, 
+     * la lista se queda lista para añadir elementos sin lanzar excepciones.
+     */
 	public OperarioMunicipal(Estados estado, String idUsuario, String nombre, String apellidos,
 			String correoElectronico, String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario,
 			String fotoPerfilUrl, TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones,
-			Timestamp fechaCreacion, Timestamp fechaEliminacion, List<Notificacion> notificacionesRecibidas,
+			Timestamp fechaCreacion, Timestamp fechaEliminacion, List<DocumentReference> notificacionesRecibidas,
 			Especialidades especialidad, Boolean disponible, Boolean carnetConducir, String telefonoTrabajo,
 			Integer numeroCuadrilla, Integer incidenciasResueltas, List<DocumentReference> listaIncidenciasAsignadas) {
 		super(estado, idUsuario, nombre, apellidos, correoElectronico, clave, fechaNacimiento, rolUsuario,

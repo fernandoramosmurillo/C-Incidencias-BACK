@@ -2,8 +2,10 @@ package com.cIncidencias.api.repositorios;
 
 import com.cIncidencias.api.ficheros.ManejadorFicheros;
 import com.cIncidencias.api.modelos.ModeloBase;
+import com.cIncidencias.api.modelos.ModeloBase.Estados;
 import com.cIncidencias.api.modelos.Usuario;
 import com.google.api.core.ApiFuture;
+import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
@@ -18,7 +20,8 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * Repositorio para la gestión de usuarios en Firestore. Implementa
- * IGenericoRepository para estandarizar la persistencia de ciudadanos y admins.
+ * IGenericoRepository para estandarizar la persistencia de ciudadanos, operarios y admins.
+ * Se encarga de centralizar las operaciones sobre la colección central de perfiles.
  */
 @Repository
 public class UsuarioRepository implements IGenericoRepository<Usuario> {
@@ -31,6 +34,11 @@ public class UsuarioRepository implements IGenericoRepository<Usuario> {
 		this.FIRESTORE = firestore;
 	}
 
+	/**
+	 * Registra un nuevo usuario en Firestore.
+	 * Además de la persistencia, deja constancia en el log local del nombre completo
+	 * del usuario para facilitar el rastreo administrativo.
+	 */
 	@Override
 	public void guardar(Usuario usuario) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(usuario.getIdUsuario());
@@ -48,6 +56,9 @@ public class UsuarioRepository implements IGenericoRepository<Usuario> {
 						false);
 	}
 
+	/**
+	 * Recupera todos los usuarios registrados en el sistema.
+	 */
 	@Override
 	public List<Usuario> obtenerTodos() throws InterruptedException, ExecutionException {
 		ApiFuture<QuerySnapshot> query = FIRESTORE.collection(COLECCION).get();
@@ -55,6 +66,9 @@ public class UsuarioRepository implements IGenericoRepository<Usuario> {
 		return querySnapshot.toObjects(Usuario.class);
 	}
 
+	/**
+	 * Busca un perfil de usuario mediante su identificador único (UID).
+	 */
 	@Override
 	public Usuario obtenerPorId(String idUsuario) throws InterruptedException, ExecutionException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idUsuario);
@@ -63,6 +77,9 @@ public class UsuarioRepository implements IGenericoRepository<Usuario> {
 		return doc.exists() ? doc.toObject(Usuario.class) : null;
 	}
 
+	/**
+	 * Elimina permanentemente la cuenta de usuario de la base de datos de Firestore.
+	 */
 	@Override
 	public void eliminar(String idUsuario) throws InterruptedException, ExecutionException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idUsuario);
@@ -78,6 +95,9 @@ public class UsuarioRepository implements IGenericoRepository<Usuario> {
 				+ " eliminado con éxito de Firestore. Fecha: " + resultadoEscritura.getUpdateTime().toDate(), false);
 	}
 
+	/**
+	 * Actualiza los datos de perfil de un usuario existente.
+	 */
 	@Override
 	public void modificar(Usuario usuario) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(usuario.getIdUsuario());
@@ -90,14 +110,30 @@ public class UsuarioRepository implements IGenericoRepository<Usuario> {
 				+ usuario.getNombre() + "] modificado correctamente. Fecha: " + fechaActualizacion, false);
 	}
 
+	/**
+	 * Gestiona cambios en el estado de la cuenta (por ejemplo, BLOQUEADO por seguridad).
+	 * En caso de marcarse como ELIMINADO (borrado lógico), se actualiza automáticamente
+	 * la marca de tiempo de eliminación en el documento.
+	 */
 	@Override
 	public void cambiarEstado(String idUsuario, ModeloBase.Estados estado)
 	        throws InterruptedException, ExecutionException, IOException {
 
 	    DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idUsuario);
-
-	    ApiFuture<WriteResult> result = docRef.update("estado", estado.name());
-	    WriteResult updateResult = result.get();
+	    WriteResult updateResult = null;
+	    
+	    if (!estado.equals(Estados.ELIMINADO)) {
+	        // Cambio de estado normal del usuario (ej: de ACTIVO a INACTIVO)
+	        ApiFuture<WriteResult> result = docRef.update("estado", estado.name());
+		    updateResult = result.get();
+	    } else {
+	        // Si el usuario se elimina, registramos el estado y la fecha de borrado en Firestore
+	        ApiFuture<WriteResult> result = docRef.update(
+	    			"estado", estado.name(),
+	    			"fechaEliminacion", Timestamp.now()
+	    	);
+		    updateResult = result.get();
+	    }
 
 	    if (!archivoLog.exists()) {
 	        archivoLog.mkdirs();
@@ -111,5 +147,4 @@ public class UsuarioRepository implements IGenericoRepository<Usuario> {
 	            false
 	    );
 	}
-
 }

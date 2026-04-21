@@ -15,10 +15,14 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/comentarios")
+@CrossOrigin(origins = "*")
 public class ComentarioController {
 
 	private final IGenericoService<Comentario> comentarioService;
 
+	/**
+	 * Inyectamos el servicio genérico para manejar los comentarios.
+	 */
 	public ComentarioController(IGenericoService<Comentario> comentarioService) {
 		this.comentarioService = comentarioService;
 	}
@@ -32,6 +36,7 @@ public class ComentarioController {
 			List<Comentario> lista = comentarioService.obtenerTodos();
 			return new ResponseEntity<>(lista, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -46,6 +51,7 @@ public class ComentarioController {
 			return (comentario != null) ? new ResponseEntity<>(comentario, HttpStatus.OK)
 					: new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -59,13 +65,14 @@ public class ComentarioController {
 			comentarioService.guardar(comentario);
 			return new ResponseEntity<>("Comentario registrado con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	/**
-	 * ¡Advertencia! Este método solo debe usarse durante las pruebas y desarrollo.
-	 * * Crea una lista de nuevos comentarios. POST /api/comentarios/guardarLista
+	 * Este método lo usamos para volcar datos de prueba rápidamente. 
+	 * POST /api/comentarios/guardarLista
 	 */
 	@PostMapping("/guardarLista")
 	public ResponseEntity<String> guardarLista(@RequestBody List<Comentario> listaComentarios) {
@@ -75,6 +82,7 @@ public class ComentarioController {
 			}
 			return new ResponseEntity<>("Lista de comentarios registrada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -88,6 +96,7 @@ public class ComentarioController {
 			comentarioService.modificar(comentario);
 			return new ResponseEntity<>("Comentario actualizado correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -101,12 +110,14 @@ public class ComentarioController {
 			comentarioService.eliminar(id);
 			return new ResponseEntity<>("Comentario eliminado", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
 	/**
-	 * Cambia el estado del comentario (Activo, Inactivo, Eliminado, etc.)
+	 * Cambia el estado del comentario (Activo, Inactivo, Eliminado, etc.) 
+	 * sin necesidad de borrar el registro completo.
 	 */
 	@PutMapping("/{id}/estado/{estado}")
 	public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable ModeloBase.Estados estado) {
@@ -114,6 +125,7 @@ public class ComentarioController {
 	        comentarioService.cambiarEstado(id, estado);
 	        return new ResponseEntity<>("Estado del comentario actualizado a: " + estado, HttpStatus.OK);
 	    } catch (Exception e) {
+	    	e.printStackTrace();
 	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 	}

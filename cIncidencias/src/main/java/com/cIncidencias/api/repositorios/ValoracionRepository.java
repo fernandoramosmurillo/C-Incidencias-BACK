@@ -2,8 +2,10 @@ package com.cIncidencias.api.repositorios;
 
 import com.cIncidencias.api.ficheros.ManejadorFicheros;
 import com.cIncidencias.api.modelos.ModeloBase;
+import com.cIncidencias.api.modelos.ModeloBase.Estados;
 import com.cIncidencias.api.modelos.Valoracion;
 import com.google.api.core.ApiFuture;
+import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
@@ -19,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * Repositorio para la gestión de valoraciones de los usuarios en Firestore.
  * Implementa IGenericoRepository para estandarizar el feedback sobre la resolución de incidencias.
+ * Permite analizar la satisfacción del ciudadano una vez finalizado el trabajo técnico.
  */
 @Repository
 public class ValoracionRepository implements IGenericoRepository<Valoracion> {
@@ -31,6 +34,11 @@ public class ValoracionRepository implements IGenericoRepository<Valoracion> {
 		this.FIRESTORE = firestore;
 	}
 
+	/**
+	 * Guarda una nueva valoración en Firestore. 
+	 * Se deja constancia en el log local para auditorías de calidad del servicio,
+	 * usando la fecha local para facilitar la lectura.
+	 */
 	@Override
 	public void guardar(Valoracion valoracion) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(valoracion.getIdValoracion());
@@ -45,6 +53,9 @@ public class ValoracionRepository implements IGenericoRepository<Valoracion> {
 				+ "' registrada con éxito. Fecha: " + result.get().getUpdateTime().toDate(), false);
 	}
 
+	/**
+	 * Recupera el listado de todas las reseñas y puntuaciones recibidas.
+	 */
 	@Override
 	public List<Valoracion> obtenerTodos() throws InterruptedException, ExecutionException {
 		ApiFuture<QuerySnapshot> query = FIRESTORE.collection(COLECCION).get();
@@ -52,6 +63,9 @@ public class ValoracionRepository implements IGenericoRepository<Valoracion> {
 		return querySnapshot.toObjects(Valoracion.class);
 	}
 
+	/**
+	 * Busca una valoración específica a través de su identificador.
+	 */
 	@Override
 	public Valoracion obtenerPorId(String idValoracion) throws InterruptedException, ExecutionException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idValoracion);
@@ -60,6 +74,9 @@ public class ValoracionRepository implements IGenericoRepository<Valoracion> {
 		return doc.exists() ? doc.toObject(Valoracion.class) : null;
 	}
 
+	/**
+	 * Elimina físicamente el documento de la valoración en Firestore.
+	 */
 	@Override
 	public void eliminar(String idValoracion) throws InterruptedException, ExecutionException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idValoracion);
@@ -75,6 +92,9 @@ public class ValoracionRepository implements IGenericoRepository<Valoracion> {
 				+ " eliminada de Firestore. Fecha: " + resultadoEscritura.getUpdateTime().toDate(), false);
 	}
 
+	/**
+	 * Modifica una valoración existente.
+	 */
 	@Override
 	public void modificar(Valoracion valoracion) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(valoracion.getIdValoracion());
@@ -87,14 +107,30 @@ public class ValoracionRepository implements IGenericoRepository<Valoracion> {
 				+ " modificada correctamente. Fecha: " + fechaActualizacion, false);
 	}
 	
+	/**
+	 * Actualiza el estado lógico de la valoración (ej: de ACTIVO a INACTIVO).
+	 * Si el estado cambia a ELIMINADO, se registra automáticamente la fecha de borrado lógico
+	 * para mantener el historial de integridad de los datos.
+	 */
 	@Override
 	public void cambiarEstado(String idValoracion, ModeloBase.Estados estado)
 	        throws InterruptedException, ExecutionException, IOException {
 
 	    DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idValoracion);
-
-	    ApiFuture<WriteResult> result = docRef.update("estado", estado.name());
-	    WriteResult updateResult = result.get();
+	    WriteResult updateResult = null;
+	    
+	    if (!estado.equals(Estados.ELIMINADO)) {
+	        // Cambio de estado normal para la valoración
+	        ApiFuture<WriteResult> result = docRef.update("estado", estado.name());
+		    updateResult = result.get();
+	    } else {
+	        // Si la valoración se elimina, guardamos el estado y la fecha de borrado en Firestore
+	        ApiFuture<WriteResult> result = docRef.update(
+	    			"estado", estado.name(),
+	    			"fechaEliminacion", Timestamp.now()
+	    	);
+		    updateResult = result.get();
+	    }
 
 	    if (!archivoLog.exists()) {
 	        archivoLog.mkdirs();

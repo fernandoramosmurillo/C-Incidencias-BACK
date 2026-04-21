@@ -14,6 +14,8 @@ import java.util.concurrent.ExecutionException;
 /**
  * Servicio para gestionar la lógica de las incidencias ciudadanas.
  * Implementa IGenericoService para estandarizar la gestión de reportes urbanos.
+ * Actúa como el núcleo de control para el flujo de trabajo desde que se reporta 
+ * una avería hasta su resolución final.
  */
 @Service
 public class IncidenciaService implements IGenericoService<Incidencia> {
@@ -27,7 +29,7 @@ public class IncidenciaService implements IGenericoService<Incidencia> {
 	/**
 	 * Valida y registra una nueva incidencia.
 	 * Asigna el estado 'PENDIENTE' por defecto si no se especifica uno.
-	 * * @param incidencia Objeto con la información del reporte.
+	 * @param incidencia Objeto con la información del reporte.
 	 * @throws NullParamsException Si la incidencia es nula o carece de título/descripción.
 	 * @throws ExecutionException Si falla la tarea asíncrona en Firestore.
 	 * @throws InterruptedException Si se interrumpe la conexión con el servidor.
@@ -44,7 +46,7 @@ public class IncidenciaService implements IGenericoService<Incidencia> {
 		}
 
 		// Lógica de negocio: establecer estado inicial si viene vacío
-		if (incidencia.getEstado() == null || incidencia.getEstadoIncidencia().toString().isEmpty()) {
+		if (incidencia.getEstadoIncidencia() == null) {
 			incidencia.setEstadoIncidencia(EstadosIncidencia.PENDIENTE);
 		}
 		
@@ -53,7 +55,7 @@ public class IncidenciaService implements IGenericoService<Incidencia> {
 
 	/**
 	 * Recupera todas las incidencias registradas en el sistema.
-	 * * @return Lista de objetos Incidencia.
+	 * @return Lista de objetos Incidencia.
 	 * @throws ExecutionException Si hay un error en la recuperación de datos desde Firestore.
 	 * @throws InterruptedException Si se interrumpe el proceso de consulta.
 	 */
@@ -64,7 +66,7 @@ public class IncidenciaService implements IGenericoService<Incidencia> {
 
 	/**
 	 * Busca una incidencia específica mediante su identificador.
-	 * * @param idIncidencia Identificador único del reporte.
+	 * @param idIncidencia Identificador único del reporte.
 	 * @return La Incidencia encontrada o null si no existe.
 	 * @throws NullParamsException Si el identificador es nulo.
 	 * @throws ExecutionException Si ocurre un fallo en la consulta al servidor.
@@ -72,7 +74,7 @@ public class IncidenciaService implements IGenericoService<Incidencia> {
 	 */
 	@Override
 	public Incidencia obtenerPorId(String idIncidencia) throws NullParamsException, ExecutionException, InterruptedException {
-		if (idIncidencia == null) {
+		if (idIncidencia == null || idIncidencia.trim().isEmpty()) {
 			throw new NullParamsException("Se requiere un ID válido para buscar la incidencia.");
 		}
 		return incidenciaRepository.obtenerPorId(idIncidencia);
@@ -80,7 +82,7 @@ public class IncidenciaService implements IGenericoService<Incidencia> {
 
 	/**
 	 * Elimina una incidencia tras validar su identificador.
-	 * * @param idIncidencia ID de la incidencia a borrar.
+	 * @param idIncidencia ID de la incidencia a borrar.
 	 * @throws NullParamsException Si el ID es nulo.
 	 * @throws ExecutionException Si el borrado falla en la base de datos.
 	 * @throws InterruptedException Si se interrumpe la tarea.
@@ -88,7 +90,7 @@ public class IncidenciaService implements IGenericoService<Incidencia> {
 	 */
 	@Override
 	public void eliminar(String idIncidencia) throws NullParamsException, ExecutionException, InterruptedException, IOException {
-		if (idIncidencia == null) {
+		if (idIncidencia == null || idIncidencia.trim().isEmpty()) {
 			throw new NullParamsException("Se requiere un ID para eliminar la incidencia.");
 		}
 		incidenciaRepository.eliminar(idIncidencia);
@@ -96,7 +98,7 @@ public class IncidenciaService implements IGenericoService<Incidencia> {
 
 	/**
 	 * Actualiza los datos de una incidencia existente.
-	 * * @param incidencia Objeto con los datos actualizados e ID válido.
+	 * @param incidencia Objeto con los datos actualizados e ID válido.
 	 * @throws NullParamsException Si la incidencia o su ID son nulos.
 	 * @throws ExecutionException Si la actualización falla en Firestore.
 	 * @throws InterruptedException Si se interrumpe la comunicación asíncrona.
@@ -104,17 +106,21 @@ public class IncidenciaService implements IGenericoService<Incidencia> {
 	 */
 	@Override
 	public void modificar(Incidencia incidencia) throws NullParamsException, ExecutionException, InterruptedException, IOException {
-		if (incidencia == null || incidencia.getIdIncidencia() == null) {
+		if (incidencia == null || incidencia.getIdIncidencia() == null || incidencia.getIdIncidencia().trim().isEmpty()) {
 			throw new NullParamsException("Datos insuficientes para modificar la incidencia.");
 		}
 		incidenciaRepository.modificar(incidencia);
 	}
 	
+	/**
+	 * Gestiona el cambio de estado administrativo de la incidencia.
+	 * Valida que el identificador sea correcto antes de proceder con el cambio en el repositorio.
+	 */
 	@Override
 	public void cambiarEstado(String idIncidencia, ModeloBase.Estados estado) throws Exception {
 
 	    if (idIncidencia == null || idIncidencia.trim().isEmpty()) {
-	        throw new NullParamsException("Se necesita un ID válido para eliminar el comentario temporalmente.");
+	        throw new NullParamsException("Se necesita un ID válido para cambiar el estado de la incidencia.");
 	    }
 
 	    incidenciaRepository.cambiarEstado(idIncidencia, estado);

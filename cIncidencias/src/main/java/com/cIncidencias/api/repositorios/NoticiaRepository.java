@@ -2,8 +2,10 @@ package com.cIncidencias.api.repositorios;
 
 import com.cIncidencias.api.ficheros.ManejadorFicheros;
 import com.cIncidencias.api.modelos.ModeloBase;
+import com.cIncidencias.api.modelos.ModeloBase.Estados;
 import com.cIncidencias.api.modelos.Noticia;
 import com.google.api.core.ApiFuture;
+import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
@@ -19,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * Repositorio para la gestión de noticias y comunicados oficiales en Firestore.
  * Implementa IGenericoRepository para estandarizar el acceso a la información municipal.
+ * Se encarga de que cada bando o noticia llegue correctamente a la base de datos de Google.
  */
 @Repository
 public class NoticiaRepository implements IGenericoRepository<Noticia> {
@@ -31,6 +34,11 @@ public class NoticiaRepository implements IGenericoRepository<Noticia> {
 		this.FIRESTORE = firestore;
 	}
 
+	/**
+	 * Publica una noticia nueva en Firestore. 
+	 * Además de guardarla, genera un registro en el log local con el título 
+	 * de la noticia para que sea más fácil de identificar en las auditorías.
+	 */
 	@Override
 	public void guardar(Noticia noticia) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(noticia.getIdNoticia());
@@ -45,6 +53,9 @@ public class NoticiaRepository implements IGenericoRepository<Noticia> {
 				+ "' publicada con éxito. Fecha: " + result.get().getUpdateTime().toDate(), false);
 	}
 
+	/**
+	 * Recupera todas las noticias del tablón municipal.
+	 */
 	@Override
 	public List<Noticia> obtenerTodos() throws InterruptedException, ExecutionException {
 		ApiFuture<QuerySnapshot> query = FIRESTORE.collection(COLECCION).get();
@@ -52,6 +63,9 @@ public class NoticiaRepository implements IGenericoRepository<Noticia> {
 		return querySnapshot.toObjects(Noticia.class);
 	}
 
+	/**
+	 * Obtiene el contenido completo de una noticia mediante su ID único.
+	 */
 	@Override
 	public Noticia obtenerPorId(String idNoticia) throws InterruptedException, ExecutionException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idNoticia);
@@ -60,6 +74,9 @@ public class NoticiaRepository implements IGenericoRepository<Noticia> {
 		return doc.exists() ? doc.toObject(Noticia.class) : null;
 	}
 
+	/**
+	 * Borra físicamente la noticia de Firestore.
+	 */
 	@Override
 	public void eliminar(String idNoticia) throws InterruptedException, ExecutionException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idNoticia);
@@ -75,6 +92,9 @@ public class NoticiaRepository implements IGenericoRepository<Noticia> {
 				+ " eliminada. Fecha: " + resultadoEscritura.getUpdateTime().toDate(), false);
 	}
 
+	/**
+	 * Modifica una noticia ya existente (útil para corregir erratas o actualizar información).
+	 */
 	@Override
 	public void modificar(Noticia noticia) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(noticia.getIdNoticia());
@@ -87,14 +107,29 @@ public class NoticiaRepository implements IGenericoRepository<Noticia> {
 				+ " modificada correctamente. Fecha: " + fechaActualizacion, false);
 	}
 	
+	/**
+	 * Actualiza el estado de la noticia (por ejemplo, para despublicarla pasando a INACTIVO).
+	 * Si el estado es ELIMINADO, se encarga de dejar constancia de la fecha de borrado lógico.
+	 */
 	@Override
 	public void cambiarEstado(String idNoticia, ModeloBase.Estados estado)
 	        throws InterruptedException, ExecutionException, IOException {
 
 	    DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idNoticia);
-
-	    ApiFuture<WriteResult> result = docRef.update("estado", estado.name());
-	    WriteResult updateResult = result.get();
+	    WriteResult updateResult = null;
+	    
+	    if (!estado.equals(Estados.ELIMINADO)) {
+	    	// Cambio de estado estándar para la noticia
+	    	ApiFuture<WriteResult> result = docRef.update("estado", estado.name());
+		    updateResult = result.get();
+	    } else {
+	    	// Si eliminamos la noticia, registramos también la fecha del borrado
+	    	ApiFuture<WriteResult> result = docRef.update(
+	    			"estado", estado.name(),
+	    			"fechaEliminacion", Timestamp.now()
+	    	);
+		    updateResult = result.get();
+	    }
 
 	    if (!archivoLog.exists()) {
 	        archivoLog.mkdirs();

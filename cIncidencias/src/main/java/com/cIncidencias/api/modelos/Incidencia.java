@@ -2,6 +2,7 @@ package com.cIncidencias.api.modelos;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import com.cIncidencias.api.modelos.Serializadores.DocumentReferenceDeserializer;
@@ -58,7 +59,7 @@ public class Incidencia extends ModeloBase {
     
     @JsonSerialize(contentUsing = DocumentReferenceSerializer.class)
     @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
-    private TreeMap<String, DocumentReference> listaOperarios = new TreeMap<>(); // Diccionario de técnicos asignados para evitar nulos
+    private List<DocumentReference> listaOperarios = new ArrayList<>(); // Diccionario de técnicos asignados para evitar nulos
     
     @JsonSerialize(contentUsing = DocumentReferenceSerializer.class)
     @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
@@ -67,15 +68,24 @@ public class Incidencia extends ModeloBase {
     // Atributos de categorización propios de la incidencia
     private Prioridades prioridad;
     private EstadosIncidencia estadoIncidencia = EstadosIncidencia.ABIERTA; // Estado inicial por defecto
-    private Valoracion valoracion; // Calificación final que otorga el ciudadano
     
-    public Incidencia(String idIncidencia, String nombre, String descripcion, GeoPoint ubicacion, String imagenUrl,
+    @JsonDeserialize(using = DocumentReferenceDeserializer.class)
+    @JsonSerialize(using = DocumentReferenceSerializer.class)
+    private DocumentReference valoracion;
+    
+    /**
+     * Constructor principal de la incidencia. 
+     * He dejado montadas las validaciones para que, si al recuperar los datos de Firestore nos 
+     * vienen nulos en operarios o comentarios, se creen como listas vacías. Así evitamos 
+     * que la App falle al intentar añadir datos sobre la marcha.
+     */
+    public Incidencia(String idIncidencia, String titulo, String descripcion, GeoPoint ubicacion, String imagenUrl,
             Timestamp fechaCreacion, Timestamp fechaCierre, DocumentReference usuarioCiudadano,
-            TreeMap<String, DocumentReference> listaOperarios, List<DocumentReference> comentarios, Prioridades prioridad,
-            EstadosIncidencia estadoIncidencia, Valoracion valoracion) {
+            List<DocumentReference> listaOperarios, List<DocumentReference> comentarios, Prioridades prioridad,
+            EstadosIncidencia estadoIncidencia, DocumentReference valoracion) {
         super(); // Llama al constructor de ModeloBase para mantener la jerarquía
         this.idIncidencia = idIncidencia;
-        this.titulo = nombre;
+        this.titulo = titulo;
         this.descripcion = descripcion;
         this.ubicacion = ubicacion;
         this.imagenUrl = imagenUrl;
@@ -84,7 +94,7 @@ public class Incidencia extends ModeloBase {
         this.usuarioCiudadano = usuarioCiudadano;
         
         // Si Firebase nos devuelve un nulo en las colecciones, las inicializamos vacías
-        this.listaOperarios = (listaOperarios != null) ? listaOperarios : new TreeMap<>();
+        this.listaOperarios = (listaOperarios != null) ? listaOperarios : new ArrayList<>();
         this.comentarios = (comentarios != null) ? comentarios : new ArrayList<>();
         
         this.prioridad = prioridad;

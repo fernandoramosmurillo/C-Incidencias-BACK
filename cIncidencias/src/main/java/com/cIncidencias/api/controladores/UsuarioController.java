@@ -15,16 +15,20 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/usuarios")
+@CrossOrigin(origins = "*")
 public class UsuarioController {
 
 	private final IGenericoService<Usuario> usuarioService;
 
+	/**
+	 * Inyectamos el servicio para gestionar toda la lógica de los usuarios.
+	 */
 	public UsuarioController(IGenericoService<Usuario> usuarioService) {
 		this.usuarioService = usuarioService;
 	}
 
 	/**
-	 * Obtiene el listado de todos los usuarios registrados.
+	 * Devuelve la lista de todos los usuarios que tenemos en la base de datos.
 	 * GET /api/usuarios
 	 */
 	@GetMapping
@@ -33,12 +37,13 @@ public class UsuarioController {
 			List<Usuario> lista = usuarioService.obtenerTodos();
 			return new ResponseEntity<>(lista, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	/**
-	 * Busca un usuario por su identificador único.
+	 * Busca los datos de un usuario concreto a través de su ID único.
 	 * GET /api/usuarios/{id}
 	 */
 	@GetMapping("/{id}")
@@ -49,12 +54,13 @@ public class UsuarioController {
 					? new ResponseEntity<>(usuario, HttpStatus.OK) 
 					: new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	/**
-	 * Registra un nuevo usuario en el sistema.
+	 * Da de alta a un nuevo usuario en el sistema.
 	 * POST /api/usuarios
 	 */
 	@PostMapping
@@ -63,6 +69,7 @@ public class UsuarioController {
 			usuarioService.guardar(usuario);
 			return new ResponseEntity<>("Usuario registrado con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -81,12 +88,13 @@ public class UsuarioController {
 			}
 			return new ResponseEntity<>("Carga masiva de usuarios completada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	/**
-	 * Actualiza la información de un usuario existente.
+	 * Actualiza la información (nombre, apellidos, etc.) de un perfil que ya existe.
 	 * PUT /api/usuarios
 	 */
 	@PutMapping
@@ -95,12 +103,13 @@ public class UsuarioController {
 			usuarioService.modificar(usuario);
 			return new ResponseEntity<>("Perfil de usuario actualizado correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	/**
-	 * Elimina a un usuario del sistema por su ID.
+	 * Elimina por completo a un usuario del sistema usando su ID.
 	 * DELETE /api/usuarios/{id}
 	 */
 	@DeleteMapping("/{id}")
@@ -109,13 +118,14 @@ public class UsuarioController {
 			usuarioService.eliminar(id);
 			return new ResponseEntity<>("Usuario eliminado correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
 	/**
-	 * Cambia el estado del perfil de usuario (ACTIVO, INACTIVO, ELIMINADO, etc.)
-	 * PUT /api/usuarios/{id}/estado/{estado}
+	 * Cambia el estado del perfil sin necesidad de borrar los datos. 
+	 * Útil para bloqueos temporales o bajas lógicas.
 	 */
 	@PutMapping("/{id}/estado/{estado}")
 	public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable ModeloBase.Estados estado) {
@@ -123,6 +133,7 @@ public class UsuarioController {
 	        usuarioService.cambiarEstado(id, estado);
 	        return new ResponseEntity<>("Estado del usuario actualizado a: " + estado, HttpStatus.OK);
 	    } catch (Exception e) {
+	    	e.printStackTrace();
 	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 	}

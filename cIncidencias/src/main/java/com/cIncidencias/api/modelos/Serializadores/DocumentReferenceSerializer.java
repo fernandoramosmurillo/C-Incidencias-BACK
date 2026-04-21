@@ -8,6 +8,12 @@ import com.google.cloud.firestore.DocumentReference;
 import java.io.IOException;
 
 public class DocumentReferenceSerializer extends JsonSerializer<DocumentReference> {
+    
+    /**
+     * Convierte la referencia de Firestore en una cadena de texto plana para el JSON.
+     * Básicamente, en vez de mandar todo el objeto de la referencia (que es un lío), 
+     * mandamos solo la ruta tipo "coleccion/id" para que sea más fácil de leer fuera.
+     */
     @Override
     public void serialize(DocumentReference value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         if (value != null) {

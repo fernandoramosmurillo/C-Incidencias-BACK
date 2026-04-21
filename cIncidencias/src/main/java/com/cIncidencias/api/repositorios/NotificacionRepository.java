@@ -2,8 +2,10 @@ package com.cIncidencias.api.repositorios;
 
 import com.cIncidencias.api.ficheros.ManejadorFicheros;
 import com.cIncidencias.api.modelos.ModeloBase;
+import com.cIncidencias.api.modelos.ModeloBase.Estados;
 import com.cIncidencias.api.modelos.Notificacion;
 import com.google.api.core.ApiFuture;
+import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
@@ -19,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * Repositorio para la gestión de notificaciones y alertas al usuario en Firestore.
  * Implementa IGenericoRepository para estandarizar el flujo de avisos del sistema.
+ * Se asegura de que cada alerta (ya sea por una incidencia o un aviso del sistema) quede persistida.
  */
 @Repository
 public class NotificacionRepository implements IGenericoRepository<Notificacion> {
@@ -31,6 +34,11 @@ public class NotificacionRepository implements IGenericoRepository<Notificacion>
 		this.FIRESTORE = firestore;
 	}
 
+	/**
+	 * Guarda una nueva notificación en la base de datos.
+	 * Al igual que en el resto de repositorios, registramos el envío en el log 
+	 * local para tener un respaldo de qué alertas se han disparado.
+	 */
 	@Override
 	public void guardar(Notificacion notificacion) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(notificacion.getIdNotificacion());
@@ -45,6 +53,9 @@ public class NotificacionRepository implements IGenericoRepository<Notificacion>
 				+ "' enviada con éxito. Fecha: " + result.get().getUpdateTime().toDate(), false);
 	}
 
+	/**
+	 * Recupera el historial completo de notificaciones del sistema.
+	 */
 	@Override
 	public List<Notificacion> obtenerTodos() throws InterruptedException, ExecutionException {
 		ApiFuture<QuerySnapshot> query = FIRESTORE.collection(COLECCION).get();
@@ -52,6 +63,9 @@ public class NotificacionRepository implements IGenericoRepository<Notificacion>
 		return querySnapshot.toObjects(Notificacion.class);
 	}
 
+	/**
+	 * Busca una notificación específica por su ID.
+	 */
 	@Override
 	public Notificacion obtenerPorId(String idNotificacion) throws InterruptedException, ExecutionException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idNotificacion);
@@ -60,6 +74,9 @@ public class NotificacionRepository implements IGenericoRepository<Notificacion>
 		return doc.exists() ? doc.toObject(Notificacion.class) : null;
 	}
 
+	/**
+	 * Elimina permanentemente una notificación de Firestore.
+	 */
 	@Override
 	public void eliminar(String idNotificacion) throws InterruptedException, ExecutionException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idNotificacion);
@@ -75,6 +92,9 @@ public class NotificacionRepository implements IGenericoRepository<Notificacion>
 				+ " eliminada de Firestore. Fecha: " + resultadoEscritura.getUpdateTime().toDate(), false);
 	}
 
+	/**
+	 * Permite modificar los datos de una notificación enviada.
+	 */
 	@Override
 	public void modificar(Notificacion notificacion) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(notificacion.getIdNotificacion());
@@ -87,14 +107,29 @@ public class NotificacionRepository implements IGenericoRepository<Notificacion>
 				+ " modificada correctamente. Fecha: " + fechaActualizacion, false);
 	}
 	
+	/**
+	 * Cambia el estado de la notificación (por ejemplo, de ACTIVO a INACTIVO).
+	 * Si el estado es ELIMINADO, se realiza el borrado lógico registrando la fecha exacta.
+	 */
 	@Override
 	public void cambiarEstado(String idNotificacion, ModeloBase.Estados estado)
 	        throws InterruptedException, ExecutionException, IOException {
 
 	    DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idNotificacion);
-
-	    ApiFuture<WriteResult> result = docRef.update("estado", estado.name());
-	    WriteResult updateResult = result.get();
+	    WriteResult updateResult = null;
+	    
+	    if (!estado.equals(Estados.ELIMINADO)) {
+	        // Cambio de estado normal para la notificación
+	        ApiFuture<WriteResult> result = docRef.update("estado", estado.name());
+		    updateResult = result.get();
+	    } else {
+	        // Si eliminamos la notificación, guardamos el estado y la fecha de borrado a la vez
+	        ApiFuture<WriteResult> result = docRef.update(
+	    			"estado", estado.name(),
+	    			"fechaEliminacion", Timestamp.now()
+	    	);
+		    updateResult = result.get();
+	    }
 
 	    if (!archivoLog.exists()) {
 	        archivoLog.mkdirs();

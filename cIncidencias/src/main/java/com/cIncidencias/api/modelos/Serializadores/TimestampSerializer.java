@@ -10,6 +10,11 @@ import java.util.TimeZone;
 
 public class TimestampSerializer extends JsonSerializer<Timestamp> {
 
+    /**
+     * Pasa el objeto Timestamp a un formato de texto ISO 8601 que sea estándar.
+     * He forzado el formato con la 'Z' y el TimeZone en UTC para que no tengamos 
+     * líos de desfases horarios cuando los datos viajen entre el servidor y la App.
+     */
     @Override
     public void serialize(Timestamp value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         if (value != null) {
@@ -24,4 +29,4 @@ public class TimestampSerializer extends JsonSerializer<Timestamp> {
             gen.writeNull();
         }
     }
-} 
+}
