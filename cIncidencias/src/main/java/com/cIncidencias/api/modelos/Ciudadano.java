@@ -32,6 +32,11 @@ public class Ciudadano extends Usuario {
     @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
     private List<DocumentReference> incidenciasCalificadas = new ArrayList<>();
     
+    /**
+     * Constructor para crear un ciudadano con sus datos de contacto y su actividad.
+     * He mantenido los checks al final para que, si por lo que sea nos pasan listas null desde 
+     * el servicio, la aplicación no reviente al intentar acceder a ellas.
+     */
     public Ciudadano(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
             String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
             TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion,

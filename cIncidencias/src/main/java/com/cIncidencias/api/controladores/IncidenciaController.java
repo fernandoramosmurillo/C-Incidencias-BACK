@@ -20,12 +20,15 @@ public class IncidenciaController {
 
 	private final IGenericoService<Incidencia> incidenciaService;
 
+	/**
+	 * Constructor para inyectar el servicio de incidencias.
+	 */
 	public IncidenciaController(IGenericoService<Incidencia> incidenciaService) {
 		this.incidenciaService = incidenciaService;
 	}
 
 	/**
-	 * Obtiene el listado de todas las incidencias reportadas.
+	 * Devuelve la lista completa de todas las incidencias que hay en la base de datos.
 	 * GET /api/incidencias
 	 */
 	@GetMapping
@@ -40,7 +43,7 @@ public class IncidenciaController {
 	}
 
 	/**
-	 * Busca una incidencia por su ID.
+	 * Busca una incidencia concreta usando su ID único.
 	 * GET /api/incidencias/{id}
 	 */
 	@GetMapping("/{id}")
@@ -57,7 +60,7 @@ public class IncidenciaController {
 	}
 
 	/**
-	 * Crea una nueva incidencia
+	 * Registra una nueva incidencia en el sistema.
 	 * POST /api/incidencias
 	 */
 	@PostMapping
@@ -73,13 +76,9 @@ public class IncidenciaController {
 
 	
 	/**
-	 * ¡Advertencia!
-	 * Este metodo solo debe usarse durante las pruebas y desarollo
-	 * 
-	 * Crea una nueva incidencia
+	 * ¡Ojo! Este método es solo para cargar datos de bulto en pruebas y desarrollo.
 	 * POST /api/incidencias/guardarLista
 	 */
-	
 	@PostMapping("/guardarLista")
 	public ResponseEntity<String> guardarLista(@RequestBody List<Incidencia> listaIncidencias){
 		try {
@@ -95,7 +94,7 @@ public class IncidenciaController {
 	
 	
 	/**
-	 * Actualiza los datos de una incidencia existente (ej. cambiar el estado).
+	 * Permite modificar los datos de una incidencia que ya existe.
 	 * PUT /api/incidencias
 	 */
 	@PutMapping
@@ -110,7 +109,7 @@ public class IncidenciaController {
 	}
 	
 	/**
-	 * Elimina una incidencia
+	 * Borra el registro de una incidencia por su ID.
 	 * DELETE /api/incidencias/{id}
 	 */
 	@DeleteMapping("/{id}")
@@ -126,7 +125,7 @@ public class IncidenciaController {
 	
 	
 	/**
-	 * Cambia el estado de la incidencia (Activo, Inactivo, Eliminado, etc.)
+	 * Actualiza el estado lógico (Activo, Eliminado, etc.) sin borrar los datos del servidor.
 	 * PUT /api/incidencias/{id}/estado/{estado}
 	 */
 	@PutMapping("/{id}/estado/{estado}")

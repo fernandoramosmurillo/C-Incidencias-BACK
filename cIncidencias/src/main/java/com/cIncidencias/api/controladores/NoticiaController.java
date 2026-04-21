@@ -20,13 +20,15 @@ public class NoticiaController {
 
 	private final IGenericoService<Noticia> noticiaService;
 
+	/**
+	 * Constructor para que Spring nos inyecte el servicio de noticias.
+	 */
 	public NoticiaController(IGenericoService<Noticia> noticiaService) {
 		this.noticiaService = noticiaService;
 	}
 
 	/**
-	 * Obtiene el listado de todas las noticias publicadas.
-	 * GET /api/noticias
+	 * Trae todas las noticias de la base de datos para mostrarlas en el tablón de anuncios.
 	 */
 	@GetMapping
 	public ResponseEntity<List<Noticia>> listar() {
@@ -40,8 +42,7 @@ public class NoticiaController {
 	}
 
 	/**
-	 * Busca una noticia por su ID único.
-	 * GET /api/noticias/{id}
+	 * Busca una noticia concreta por su ID. Útil para cuando el usuario pulsa en "Leer más".
 	 */
 	@GetMapping("/{id}")
 	public ResponseEntity<Noticia> obtenerPorId(@PathVariable("id") String id) {
@@ -57,8 +58,7 @@ public class NoticiaController {
 	}
 
 	/**
-	 * Publica una nueva noticia.
-	 * POST /api/noticias
+	 * Guarda una noticia nueva enviada desde el panel de administración.
 	 */
 	@PostMapping
 	public ResponseEntity<String> guardar(@RequestBody Noticia noticia) {
@@ -72,10 +72,8 @@ public class NoticiaController {
 	}
 
 	/**
-	 * ¡Advertencia!
-	 * Este método solo debe usarse durante las pruebas y desarrollo.
-	 * * Crea una lista de noticias de forma masiva.
-	 * POST /api/noticias/guardarLista
+	 * ¡Advertencia! Este método lo uso solo para meter noticias de ejemplo 
+	 * de golpe durante el desarrollo.
 	 */
 	@PostMapping("/guardarLista")
 	public ResponseEntity<String> guardarLista(@RequestBody List<Noticia> listaNoticias) {
@@ -91,8 +89,7 @@ public class NoticiaController {
 	}
 
 	/**
-	 * Actualiza el contenido de una noticia existente.
-	 * PUT /api/noticias
+	 * Modifica los datos de una noticia que ya esté publicada.
 	 */
 	@PutMapping
 	public ResponseEntity<String> modificar(@RequestBody Noticia noticia) {
@@ -106,8 +103,7 @@ public class NoticiaController {
 	}
 
 	/**
-	 * Elimina una noticia por su identificador.
-	 * DELETE /api/noticias/{id}
+	 * Elimina definitivamente una noticia de la colección.
 	 */
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> eliminar(@PathVariable("id") String id) {
@@ -121,8 +117,8 @@ public class NoticiaController {
 	}
 	
 	/**
-	 * Cambia el estado de la noticia (Activo, Inactivo, Eliminado, etc.)
-	 * PUT /api/noticias/{id}/estado/{estado}
+	 * Cambia el estado de la noticia. Sirve para archivar noticias o 
+	 * borrarlas de forma lógica sin eliminarlas del servidor.
 	 */
 	@PutMapping("/{id}/estado/{estado}")
 	public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable ModeloBase.Estados estado) {

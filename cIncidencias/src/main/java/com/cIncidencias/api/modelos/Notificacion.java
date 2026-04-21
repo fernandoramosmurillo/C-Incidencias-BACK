@@ -35,6 +35,12 @@ public class Notificacion extends ModeloBase {
     @JsonSerialize(using = DocumentReferenceSerializer.class)
     private DocumentReference idOrigen;         // ID específico del disparador (ej: el idIncidencia)
     
+    /**
+     * Constructor para generar una nueva notificación en el sistema.
+     * He dejado la validación de destinatarios para que, si por algún motivo el servicio 
+     * no pasa la lista, se genere una vacía por defecto y no tengamos punteros nulos 
+     * al intentar procesar los envíos.
+     */
     public Notificacion(Estados estado, String idNotificacion, String titulo, String mensaje,
             List<DocumentReference> idDestinatario, TiposOrigen tipoOrigen, DocumentReference idOrigen) {
         super(estado);

@@ -20,12 +20,15 @@ public class UsuarioController {
 
 	private final IGenericoService<Usuario> usuarioService;
 
+	/**
+	 * Inyectamos el servicio para gestionar toda la lógica de los usuarios.
+	 */
 	public UsuarioController(IGenericoService<Usuario> usuarioService) {
 		this.usuarioService = usuarioService;
 	}
 
 	/**
-	 * Obtiene el listado de todos los usuarios registrados.
+	 * Devuelve la lista de todos los usuarios que tenemos en la base de datos.
 	 * GET /api/usuarios
 	 */
 	@GetMapping
@@ -40,7 +43,7 @@ public class UsuarioController {
 	}
 
 	/**
-	 * Busca un usuario por su identificador único.
+	 * Busca los datos de un usuario concreto a través de su ID único.
 	 * GET /api/usuarios/{id}
 	 */
 	@GetMapping("/{id}")
@@ -57,7 +60,7 @@ public class UsuarioController {
 	}
 
 	/**
-	 * Registra un nuevo usuario en el sistema.
+	 * Da de alta a un nuevo usuario en el sistema.
 	 * POST /api/usuarios
 	 */
 	@PostMapping
@@ -91,7 +94,7 @@ public class UsuarioController {
 	}
 
 	/**
-	 * Actualiza la información de un usuario existente.
+	 * Actualiza la información (nombre, apellidos, etc.) de un perfil que ya existe.
 	 * PUT /api/usuarios
 	 */
 	@PutMapping
@@ -106,7 +109,7 @@ public class UsuarioController {
 	}
 
 	/**
-	 * Elimina a un usuario del sistema por su ID.
+	 * Elimina por completo a un usuario del sistema usando su ID.
 	 * DELETE /api/usuarios/{id}
 	 */
 	@DeleteMapping("/{id}")
@@ -121,8 +124,8 @@ public class UsuarioController {
 	}
 	
 	/**
-	 * Cambia el estado del perfil de usuario (ACTIVO, INACTIVO, ELIMINADO, etc.)
-	 * PUT /api/usuarios/{id}/estado/{estado}
+	 * Cambia el estado del perfil sin necesidad de borrar los datos. 
+	 * Útil para bloqueos temporales o bajas lógicas.
 	 */
 	@PutMapping("/{id}/estado/{estado}")
 	public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable ModeloBase.Estados estado) {

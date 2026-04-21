@@ -1,0 +1,11 @@
+com.cIncidencias.api
+com.cIncidencias.api.config
+com.cIncidencias.api.controladores
+com.cIncidencias.api.excepciones
+com.cIncidencias.api.ficheros
+com.cIncidencias.api.modelos
+com.cIncidencias.api.modelos.Serializadores
+com.cIncidencias.api.repositorios
+com.cIncidencias.api.servicios
+com.cIncidencias.proyecto
+com.cIncidencias.proyecto.servicios

@@ -8,6 +8,12 @@ import com.google.cloud.firestore.GeoPoint;
 import java.io.IOException;
 
 public class GeoPointDeserializer extends JsonDeserializer<GeoPoint> {
+    
+    /**
+     * Transforma los datos de latitud y longitud que vienen en el JSON en un objeto 
+     * GeoPoint que entiende Firestore. Mapeamos los campos manualmente para 
+     * asegurar que las coordenadas se guarden correctamente.
+     */
     @Override
     public GeoPoint deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
     	

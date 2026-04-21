@@ -29,10 +29,17 @@ public class ComentarioRepository implements IGenericoRepository<Comentario> {
 	private final Firestore FIRESTORE;
 	private final String COLECCION = "comentarios";
 
+	/**
+	 * Inyectamos la instancia de Firestore para conectar con la base de datos de Google.
+	 */
 	public ComentarioRepository(Firestore firestore) {
 		this.FIRESTORE = firestore;
 	}
 
+	/**
+	 * Guarda un nuevo comentario en Firestore y deja huella en el log local.
+	 * Si la carpeta de logs no existe, la crea sobre la marcha para evitar errores de escritura.
+	 */
 	@Override
 	public void guardar(Comentario comentario) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(comentario.getIdComentario());
@@ -46,6 +53,9 @@ public class ComentarioRepository implements IGenericoRepository<Comentario> {
 				+ " registrado con éxito. Fecha: " + result.get().getUpdateTime().toDate(), false);
 	}
 
+	/**
+	 * Recupera todos los comentarios almacenados en la colección sin filtros previos.
+	 */
 	@Override
 	public List<Comentario> obtenerTodos() throws InterruptedException, ExecutionException {
 		ApiFuture<QuerySnapshot> query = FIRESTORE.collection(COLECCION).get();
@@ -53,6 +63,9 @@ public class ComentarioRepository implements IGenericoRepository<Comentario> {
 		return querySnapshot.toObjects(Comentario.class);
 	}
 
+	/**
+	 * Busca un comentario por su ID único y lo convierte a un objeto Comentario si existe.
+	 */
 	@Override
 	public Comentario obtenerPorId(String idComentario) throws InterruptedException, ExecutionException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idComentario);
@@ -61,6 +74,9 @@ public class ComentarioRepository implements IGenericoRepository<Comentario> {
 		return doc.exists() ? doc.toObject(Comentario.class) : null;
 	}
 
+	/**
+	 * Elimina físicamente el documento de Firestore y registra la acción en el fichero de log.
+	 */
 	@Override
 	public void eliminar(String idComentario) throws InterruptedException, ExecutionException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idComentario);
@@ -75,18 +91,24 @@ public class ComentarioRepository implements IGenericoRepository<Comentario> {
 				+ " eliminado de Firestore. Fecha: " + resultadoEscritura.getUpdateTime().toDate(), false);
 	}
 
+	/**
+	 * Sobrescribe los datos de un comentario existente con la nueva información proporcionada.
+	 */
 	@Override
 	public void modificar(Comentario comentario) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(comentario.getIdComentario());
 		ApiFuture<WriteResult> result = docRef.set(comentario);
 		
-		// Cambiado a .toDate() para consistencia local
 		Object fechaActualizacion = result.get().getUpdateTime().toDate();
 
 		ManejadorFicheros.escribir("logs/incidencias.log", "Comentario ID: " + comentario.getIdComentario() 
 				+ " modificado correctamente. Fecha: " + fechaActualizacion, false);
 	}
 	
+	/**
+	 * Actualiza solo el campo de estado de un comentario. 
+	 * Si el nuevo estado es ELIMINADO, aprovecha para setear la fecha de borrado lógico.
+	 */
 	@Override
 	public void cambiarEstado(String idComentario, ModeloBase.Estados estado)
 	        throws InterruptedException, ExecutionException, IOException {

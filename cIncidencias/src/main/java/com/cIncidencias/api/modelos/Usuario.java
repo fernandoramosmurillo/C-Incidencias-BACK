@@ -61,6 +61,12 @@ public class Usuario extends ModeloBase {
     @JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
     protected List<DocumentReference> notificacionesRecibidas = new ArrayList<>();
 
+    /**
+     * Constructor base para la entidad Usuario. 
+     * Recoge toda la información común de los perfiles del sistema. He incluido la 
+     * validación de la lista de notificaciones para asegurar que, aunque la cuenta 
+     * sea nueva, el objeto esté listo para registrar avisos sin fallos de puntero nulo.
+     */
 	public Usuario(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
 			String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
 			TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion,

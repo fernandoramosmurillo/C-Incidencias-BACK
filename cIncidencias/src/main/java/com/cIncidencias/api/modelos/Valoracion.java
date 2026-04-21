@@ -23,6 +23,11 @@ public class Valoracion extends ModeloBase{
     @JsonDeserialize(using = TimestampDeserializer.class)
     private Timestamp fechaPublicacion;
 
+    /**
+     * Constructor para crear una valoración detallada.
+     * Registra el feedback del ciudadano tras cerrar una incidencia, incluyendo 
+     * la nota numérica y el comentario que servirá para medir la calidad del servicio.
+     */
 	public Valoracion(Estados estado, String idValoracion, String nombre, String opinion, Integer puntuacionP,
 			Timestamp fechaPublicacion) {
 		super(estado);

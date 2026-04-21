@@ -13,6 +13,8 @@ import java.util.concurrent.ExecutionException;
 /**
  * Servicio para gestionar la lógica de las notificaciones y alertas del sistema.
  * Implementa IGenericoService para asegurar que los avisos a usuarios sean consistentes.
+ * Se encarga de validar que cada alerta llegue al destinatario correcto y cumpla 
+ * con los requisitos de contenido antes de disparar el aviso.
  */
 @Service
 public class NotificacionService implements IGenericoService<Notificacion> {
@@ -25,8 +27,9 @@ public class NotificacionService implements IGenericoService<Notificacion> {
 
 	/**
 	 * Valida y registra una nueva notificación.
-	 * Verifica que el mensaje y el ID del destinatario no estén vacíos.
-	 * * @param notificacion Objeto Notificacion a guardar.
+	 * Verifica que el mensaje no esté vacío y que exista al menos un ID de destinatario 
+	 * para garantizar que la alerta no se pierda en el sistema.
+	 * @param notificacion Objeto Notificacion a guardar.
 	 * @throws NullParamsException Si el objeto es nulo o faltan datos del mensaje/usuario.
 	 * @throws ExecutionException Si ocurre un error en la tarea asíncrona de Firestore.
 	 * @throws InterruptedException Si se interrumpe el hilo durante la comunicación.
@@ -42,17 +45,17 @@ public class NotificacionService implements IGenericoService<Notificacion> {
 			throw new NullParamsException("El mensaje de la notificación es obligatorio.");
 		}
 		
-		// Se verifica que tiene un usuario de destino
-		if (notificacion.getIdDestinatarios() == null || notificacion.getIdDestinatarios().size() < 1) {
-			throw new NullParamsException("La notificación debe tener un usuario de destino.");
+		// Lógica de negocio: Se verifica que tiene al menos un usuario de destino
+		if (notificacion.getIdDestinatarios() == null || notificacion.getIdDestinatarios().isEmpty()) {
+			throw new NullParamsException("La notificación debe tener al menos un usuario de destino.");
 		}
 
 		notificacionRepository.guardar(notificacion);
 	}
 
 	/**
-	 * Recupera el historial de todas las notificaciones del sistema.
-	 * * @return Lista de objetos Notificacion.
+	 * Recupera el historial de todas las notificaciones emitidas por el sistema.
+	 * @return Lista de objetos Notificacion.
 	 * @throws ExecutionException Si hay un fallo al obtener datos del servidor.
 	 * @throws InterruptedException Si se corta la conexión con Firestore.
 	 */
@@ -63,57 +66,61 @@ public class NotificacionService implements IGenericoService<Notificacion> {
 
 	/**
 	 * Busca una notificación específica por su ID único.
-	 * * @param idNotificacion Identificador de la notificación.
-	 * @return La notificación encontrada o null.
-	 * @throws NullParamsException Si el ID es nulo.
+	 * @param idNotificacion Identificador de la notificación.
+	 * @return La notificación encontrada o null si no existe.
+	 * @throws NullParamsException Si el ID es nulo o está vacío.
 	 * @throws ExecutionException Si la consulta falla en Firestore.
 	 * @throws InterruptedException Si se interrumpe la tarea.
 	 */
 	@Override
 	public Notificacion obtenerPorId(String idNotificacion) throws NullParamsException, ExecutionException, InterruptedException {
-		if (idNotificacion == null) {
-			throw new NullParamsException("Se requiere un ID para buscar la notificación.");
+		if (idNotificacion == null || idNotificacion.trim().isEmpty()) {
+			throw new NullParamsException("Se requiere un ID válido para buscar la notificación.");
 		}
 		return notificacionRepository.obtenerPorId(idNotificacion);
 	}
 
 	/**
-	 * Elimina una notificación del sistema.
-	 * * @param idNotificacion ID de la notificación a borrar.
-	 * @throws NullParamsException Si el ID es nulo.
+	 * Elimina permanentemente una notificación del sistema tras validar su existencia.
+	 * @param idNotificacion ID de la notificación a borrar.
+	 * @throws NullParamsException Si el ID es nulo o está vacío.
 	 * @throws ExecutionException Si el borrado falla en la base de datos.
 	 * @throws InterruptedException Si el hilo es interrumpido.
 	 * @throws IOException Si falla el registro en el log local.
 	 */
 	@Override
 	public void eliminar(String idNotificacion) throws NullParamsException, ExecutionException, InterruptedException, IOException {
-		if (idNotificacion == null) {
-			throw new NullParamsException("Es necesario un ID para eliminar la notificación.");
+		if (idNotificacion == null || idNotificacion.trim().isEmpty()) {
+			throw new NullParamsException("Es necesario un ID válido para eliminar la notificación.");
 		}
 		notificacionRepository.eliminar(idNotificacion);
 	}
 
 	/**
-	 * Modifica los datos de una notificación (por ejemplo, para marcarla como leída).
-	 * * @param notificacion Objeto con los datos actualizados.
-	 * @throws NullParamsException Si el objeto o su ID son nulos.
+	 * Modifica los datos de una notificación (por ejemplo, para actualizar el cuerpo del aviso).
+	 * @param notificacion Objeto con los datos actualizados e ID válido.
+	 * @throws NullParamsException Si el objeto o su ID son nulos o vacíos.
 	 * @throws ExecutionException Si la actualización falla en el servidor.
 	 * @throws InterruptedException Si se interrumpe la conexión.
 	 * @throws IOException Si ocurre un error de escritura en el log.
 	 */
 	@Override
 	public void modificar(Notificacion notificacion) throws NullParamsException, ExecutionException, InterruptedException, IOException {
-		if (notificacion == null || notificacion.getIdNotificacion() == null) {
-			throw new NullParamsException("Datos insuficientes para modificar la notificación.");
+		if (notificacion == null || notificacion.getIdNotificacion() == null || notificacion.getIdNotificacion().trim().isEmpty()) {
+			throw new NullParamsException("Datos insuficientes para modificar la notificación (ID ausente).");
 		}
 		notificacionRepository.modificar(notificacion);
 	}
 	
+	/**
+	 * Gestiona el cambio de estado de la notificación (por ejemplo, para marcarla como LEÍDA o ARCHIVADA).
+	 * Valida que el identificador sea correcto antes de proceder con el cambio en el repositorio.
+	 */
 	@Override
 	public void cambiarEstado(String idNotificacion, ModeloBase.Estados estado) throws Exception {
 
 	    if (idNotificacion == null || idNotificacion.trim().isEmpty()) {
-	        throw new NullParamsException("Se necesita un ID válido para eliminar el comentario temporalmente.");
+	        throw new NullParamsException("Se necesita un ID válido para cambiar el estado de la notificación.");
 	    }
 
 	    notificacionRepository.cambiarEstado(idNotificacion, estado);

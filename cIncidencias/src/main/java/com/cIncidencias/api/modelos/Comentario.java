@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class Comentario extends ModeloBase {
 
     private String idComentario;      // El identificador único de cada mensaje
-    private String texto;             // El contenido del mensaje (lo que escribe el usuario)
+    private String texto;               // El contenido del mensaje (lo que escribe el usuario)
     
     // Al igual que en el resto del proyecto, usamos el tiempo oficial de Google Cloud
     @JsonSerialize(using = TimestampSerializer.class)
@@ -34,6 +34,11 @@ public class Comentario extends ModeloBase {
     @JsonDeserialize(using = DocumentReferenceDeserializer.class)
     private DocumentReference usuarioAutor;
 
+    /**
+     * Constructor para inicializar un comentario. 
+     * Recoge tanto el contenido del mensaje como los metadatos de autoría y privacidad 
+     * necesarios para que se muestren correctamente en el hilo de la incidencia.
+     */
 	public Comentario(String idComentario, String texto, Timestamp fechaPublicacion, Boolean esPrivado,
 			DocumentReference usuarioAutor) {
 		super();

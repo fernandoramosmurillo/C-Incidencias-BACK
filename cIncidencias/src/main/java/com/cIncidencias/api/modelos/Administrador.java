@@ -48,6 +48,11 @@ public class Administrador extends Usuario {
 	@JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
 	private List<DocumentReference> listaNoticiasEnviadas = new ArrayList<>();
 
+	/**
+	 * Constructor completo para crear un administrador con todos sus permisos y datos de seguridad.
+	 * He incluido la validación al final para que la lista de noticias nunca nos llegue como null 
+	 * y no nos rompa la ejecución más adelante.
+	 */
 	public Administrador(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
 			String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
 			TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion,

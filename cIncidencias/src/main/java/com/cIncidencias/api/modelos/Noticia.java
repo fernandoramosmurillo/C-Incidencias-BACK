@@ -33,9 +33,14 @@ public class Noticia extends ModeloBase {
     
     @JsonDeserialize(using = DocumentReferenceDeserializer.class)
     @JsonSerialize(using = DocumentReferenceSerializer.class)
-    private DocumentReference idAutor;         // El ID del Administrador que redactó la noticia
+    private DocumentReference idAutor;           // El ID del Administrador que redactó la noticia
     private Boolean esDestacada;    // Si aparece la primera o con un diseño especial en la app
     
+    /**
+     * Constructor completo para crear una noticia desde cero. 
+     * Pasa el estado inicial a la clase padre y mapea todos los campos necesarios 
+     * para que el bando o comunicado se visualice correctamente en el tablón de anuncios.
+     */
 	public Noticia(Estados estado, String idNoticia, String titulo, String entradilla, String contenido,
 			String urlImagenPortada, String categoria, Timestamp fechaPublicacion, DocumentReference idAutor,
 			Boolean esDestacada) {

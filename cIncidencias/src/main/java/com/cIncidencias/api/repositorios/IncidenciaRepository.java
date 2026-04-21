@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * Repositorio para la gestión de incidencias ciudadanas en Firestore.
  * Implementa IGenericoRepository para asegurar la consistencia en el acceso a datos.
+ * Centraliza toda la lógica de persistencia para los reportes de averías y desperfectos.
  */
 @Repository
 public class IncidenciaRepository implements IGenericoRepository<Incidencia> {
@@ -33,6 +34,11 @@ public class IncidenciaRepository implements IGenericoRepository<Incidencia> {
 		this.FIRESTORE = firestore;
 	}
 
+	/**
+	 * Registra una incidencia en Firestore. 
+	 * Si es la primera vez que se usa el sistema, crea la carpeta de logs 
+	 * para guardar el histórico de operaciones.
+	 */
 	@Override
 	public void guardar(Incidencia incidencia) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(incidencia.getIdIncidencia());
@@ -46,6 +52,9 @@ public class IncidenciaRepository implements IGenericoRepository<Incidencia> {
 				+ " registrada con éxito. Fecha: " + result.get().getUpdateTime().toDate(), false);
 	}
 
+	/**
+	 * Obtiene el listado completo de incidencias reportadas.
+	 */
 	@Override
 	public List<Incidencia> obtenerTodos() throws InterruptedException, ExecutionException {
 		ApiFuture<QuerySnapshot> query = FIRESTORE.collection(COLECCION).get();
@@ -53,6 +62,9 @@ public class IncidenciaRepository implements IGenericoRepository<Incidencia> {
 		return querySnapshot.toObjects(Incidencia.class);
 	}
 
+	/**
+	 * Busca una incidencia por su identificador único para consultar su estado o detalles.
+	 */
 	@Override
 	public Incidencia obtenerPorId(String idIncidencia) throws InterruptedException, ExecutionException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idIncidencia);
@@ -61,6 +73,9 @@ public class IncidenciaRepository implements IGenericoRepository<Incidencia> {
 		return doc.exists() ? doc.toObject(Incidencia.class) : null;
 	}
 
+	/**
+	 * Elimina el documento de la incidencia de forma definitiva en Firestore.
+	 */
 	@Override
 	public void eliminar(String idIncidencia) throws InterruptedException, ExecutionException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idIncidencia);
@@ -75,18 +90,24 @@ public class IncidenciaRepository implements IGenericoRepository<Incidencia> {
 				+ " eliminada de Firestore. Fecha: " + resultadoEscritura.getUpdateTime().toDate(), false);
 	}
 
+	/**
+	 * Actualiza la información de una incidencia (cambios en descripción, fotos, etc).
+	 */
 	@Override
 	public void modificar(Incidencia incidencia) throws ExecutionException, InterruptedException, IOException {
 		DocumentReference docRef = FIRESTORE.collection(COLECCION).document(incidencia.getIdIncidencia());
 		ApiFuture<WriteResult> result = docRef.set(incidencia);
 		
-		// Aplicado .toDate() para mantener la consistencia en los logs
 		Object fechaActualizacion = result.get().getUpdateTime().toDate();
 
 		ManejadorFicheros.escribir("logs/incidencias.log", "Incidencia ID: " + incidencia.getIdIncidencia() 
 				+ " modificada correctamente. Fecha: " + fechaActualizacion, false);
 	}
 	
+	/**
+	 * Gestiona el ciclo de vida de la incidencia (Activa, Bloqueada o Eliminada lógicamente).
+	 * Si el estado es ELIMINADO, se registra automáticamente la fecha actual como fecha de baja.
+	 */
 	@Override
 	public void cambiarEstado(String idIncidencia, ModeloBase.Estados estado)
 	        throws InterruptedException, ExecutionException, IOException {

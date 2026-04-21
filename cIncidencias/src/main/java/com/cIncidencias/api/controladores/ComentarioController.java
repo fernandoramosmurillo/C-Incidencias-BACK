@@ -20,6 +20,9 @@ public class ComentarioController {
 
 	private final IGenericoService<Comentario> comentarioService;
 
+	/**
+	 * Inyectamos el servicio genérico para manejar los comentarios.
+	 */
 	public ComentarioController(IGenericoService<Comentario> comentarioService) {
 		this.comentarioService = comentarioService;
 	}
@@ -68,8 +71,8 @@ public class ComentarioController {
 	}
 
 	/**
-	 * ¡Advertencia! Este método solo debe usarse durante las pruebas y desarrollo.
-	 * * Crea una lista de nuevos comentarios. POST /api/comentarios/guardarLista
+	 * Este método lo usamos para volcar datos de prueba rápidamente. 
+	 * POST /api/comentarios/guardarLista
 	 */
 	@PostMapping("/guardarLista")
 	public ResponseEntity<String> guardarLista(@RequestBody List<Comentario> listaComentarios) {
@@ -113,7 +116,8 @@ public class ComentarioController {
 	}
 	
 	/**
-	 * Cambia el estado del comentario (Activo, Inactivo, Eliminado, etc.)
+	 * Cambia el estado del comentario (Activo, Inactivo, Eliminado, etc.) 
+	 * sin necesidad de borrar el registro completo.
 	 */
 	@PutMapping("/{id}/estado/{estado}")
 	public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable ModeloBase.Estados estado) {

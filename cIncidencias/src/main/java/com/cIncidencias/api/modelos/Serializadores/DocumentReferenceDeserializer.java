@@ -15,6 +15,11 @@ public class DocumentReferenceDeserializer extends JsonDeserializer<DocumentRefe
 	@Autowired
     private Firestore firestore;
 	
+	/**
+	 * Se encarga de convertir un String (la ruta del documento en Firestore) 
+	 * en un objeto DocumentReference real. Esto es clave para que Jackson 
+	 * sepa qué hacer cuando le llega una referencia en el JSON.
+	 */
 	@Override
     public DocumentReference deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
 		String pathCompleto = p.getText(); // Ejemplo: "usuarios/USR-101"

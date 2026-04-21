@@ -17,6 +17,11 @@ import com.google.firebase.cloud.FirestoreClient;
 @Configuration
 public class FirebaseConfig {
 	
+	/**
+	 * Configura el SDK de Firebase al arrancar. He puesto un control para que no 
+	 * intente inicializar la App si ya existe una instancia, que si no da errores 
+	 * raros al recargar en caliente con Spring.
+	 */
 	@PostConstruct
     public void initFirebase() {
         try {
@@ -42,7 +47,11 @@ public class FirebaseConfig {
         }
     }
 
-    // Este Bean nos permitirá usar Firestore en cualquier otra clase
+	/**
+	 * Crea el punto de acceso a Firestore. Lo dejo como Bean para poder inyectarlo 
+	 * directamente en cualquier servicio y no andar repitiendo código.
+	 * * @return Instancia de Firestore para trabajar con la base de datos.
+	 */
     @Bean
     public Firestore getFirestore() {
         return FirestoreClient.getFirestore();

@@ -73,6 +73,12 @@ public class Incidencia extends ModeloBase {
     @JsonSerialize(using = DocumentReferenceSerializer.class)
     private DocumentReference valoracion;
     
+    /**
+     * Constructor principal de la incidencia. 
+     * He dejado montadas las validaciones para que, si al recuperar los datos de Firestore nos 
+     * vienen nulos en operarios o comentarios, se creen como listas vacías. Así evitamos 
+     * que la App falle al intentar añadir datos sobre la marcha.
+     */
     public Incidencia(String idIncidencia, String titulo, String descripcion, GeoPoint ubicacion, String imagenUrl,
             Timestamp fechaCreacion, Timestamp fechaCierre, DocumentReference usuarioCiudadano,
             List<DocumentReference> listaOperarios, List<DocumentReference> comentarios, Prioridades prioridad,
