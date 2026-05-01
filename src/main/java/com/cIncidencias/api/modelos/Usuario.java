@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
  * Enumeraciones para la gestión de permisos y métodos de autenticación.
  */
 enum RolesUsuario { ADMINISTRADOR, OPERARIO, CIUDADANO }
-enum TiposAcceso { CORREO_CONTRASEÑA, GOOGLE, CLAVE_ADMIN }
+enum TiposAcceso { CORREO_CONTRASEÑA, GOOGLE, ANDROID, IOS, CLAVE_ADMIN }
 
 @Data // Genera los Getters y Setters para mantener el código más limpio y ordenado
 @NoArgsConstructor
