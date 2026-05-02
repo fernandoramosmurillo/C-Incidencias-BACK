@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class Ciudadano extends Usuario {
 
     private String dni;
-    private Integer telefonoContacto;
+    private String telefonoContacto;
     private String direccion;
     
     // Inicialización directa para evitar NullPointerException
@@ -43,7 +43,7 @@ public class Ciudadano extends Usuario {
             String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
             TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion,
             Timestamp fechaEliminacion, List<DocumentReference> notificacionesRecibidas, String dni,
-            Integer telefonoContacto, String direccion, List<DocumentReference> incidenciasSolicitadas,
+            String telefonoContacto, String direccion, List<DocumentReference> incidenciasSolicitadas,
             List<DocumentReference> incidenciasCalificadas) {
         
         super(estado, idUsuario, nombre, apellidos, correoElectronico, clave, fechaNacimiento, rolUsuario,

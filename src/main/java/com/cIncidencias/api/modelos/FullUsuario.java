@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor // La añadimos para poder hacer el "new FullUser(u, a)" fácilmente
-public class FullUser {
+public class FullUsuario {
     
-    private Usuario datosusuario;
+    private Usuario datosUsuario;
     private AuthUsuario datosAuth;
 
 }
