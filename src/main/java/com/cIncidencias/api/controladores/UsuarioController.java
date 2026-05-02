@@ -1,7 +1,10 @@
 package com.cIncidencias.api.controladores;
 
+import com.cIncidencias.api.modelos.AuthUsuario;
+import com.cIncidencias.api.modelos.FullUsuario;
 import com.cIncidencias.api.modelos.ModeloBase;
 import com.cIncidencias.api.modelos.Usuario;
+import com.cIncidencias.api.servicios.FirebaseAuthService;
 import com.cIncidencias.api.servicios.IGenericoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +22,14 @@ import java.util.List;
 public class UsuarioController {
 
 	private final IGenericoService<Usuario> usuarioService;
+	private FirebaseAuthService authService;
 
 	/**
 	 * Inyectamos el servicio para gestionar toda la lógica de los usuarios.
 	 */
-	public UsuarioController(IGenericoService<Usuario> usuarioService) {
+	public UsuarioController(IGenericoService<Usuario> usuarioService, FirebaseAuthService authService) {
 		this.usuarioService = usuarioService;
+		this.authService = authService;
 	}
 
 	/**
@@ -58,7 +63,33 @@ public class UsuarioController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
+	
+	
+	/**
+	 * Busca los datos de un usuario concreto a través de su ID único.
+	 * GET /api/usuarios/{id}
+	 */
+	@GetMapping("/completo/{id}")
+	public ResponseEntity<FullUsuario> obtenerUsuarioCompletoPorId(@PathVariable("id") String id, @RequestHeader("Authorization") String token) {
+		try {
+			AuthUsuario authUsuario = authService.verificarToken(token);
+			
+			Usuario usuario = usuarioService.obtenerPorId(id);
+			
+			if (usuario == null) {
+				return ResponseEntity.notFound().build();
+			}
+			
+			FullUsuario usuarioCompleto = new FullUsuario(usuario, authUsuario);
+			
+			return ResponseEntity.ok(usuarioCompleto);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	/**
 	 * Da de alta a un nuevo usuario en el sistema.
 	 * POST /api/usuarios
