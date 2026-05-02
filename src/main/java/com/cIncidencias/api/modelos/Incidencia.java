@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.GeoPoint;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -24,6 +26,7 @@ import lombok.NoArgsConstructor;
  * Representa una incidencia en el sistema. 
  * Hereda el estado de persistencia de ModeloBase y gestiona su propio flujo de trabajo.
  */
+@AllArgsConstructor
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -71,34 +74,5 @@ public class Incidencia extends ModeloBase {
     
     @JsonDeserialize(using = DocumentReferenceDeserializer.class)
     @JsonSerialize(using = DocumentReferenceSerializer.class)
-    private DocumentReference valoracion;
-    
-    /**
-     * Constructor principal de la incidencia. 
-     * He dejado montadas las validaciones para que, si al recuperar los datos de Firestore nos 
-     * vienen nulos en operarios o comentarios, se creen como listas vacías. Así evitamos 
-     * que la App falle al intentar añadir datos sobre la marcha.
-     */
-    public Incidencia(String idIncidencia, String titulo, String descripcion, GeoPoint ubicacion, String imagenUrl,
-            Timestamp fechaCreacion, Timestamp fechaCierre, DocumentReference usuarioCiudadano,
-            List<DocumentReference> listaOperarios, List<DocumentReference> comentarios, Prioridades prioridad,
-            EstadosIncidencia estadoIncidencia, DocumentReference valoracion) {
-        super(); // Llama al constructor de ModeloBase para mantener la jerarquía
-        this.idIncidencia = idIncidencia;
-        this.titulo = titulo;
-        this.descripcion = descripcion;
-        this.ubicacion = ubicacion;
-        this.imagenUrl = imagenUrl;
-        this.fechaCreacion = fechaCreacion;
-        this.fechaCierre = fechaCierre;
-        this.usuarioCiudadano = usuarioCiudadano;
-        
-        // Si Firebase nos devuelve un nulo en las colecciones, las inicializamos vacías
-        this.listaOperarios = (listaOperarios != null) ? listaOperarios : new ArrayList<>();
-        this.comentarios = (comentarios != null) ? comentarios : new ArrayList<>();
-        
-        this.prioridad = prioridad;
-        this.estadoIncidencia = (estadoIncidencia != null) ? estadoIncidencia : EstadosIncidencia.ABIERTA;
-        this.valoracion = valoracion;
-    } 
+    private DocumentReference valoracion; 
 }

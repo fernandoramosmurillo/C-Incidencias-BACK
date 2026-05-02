@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ import lombok.NoArgsConstructor;
 enum RolesUsuario { ADMINISTRADOR, OPERARIO, CIUDADANO }
 enum TiposAcceso { CORREO_CONTRASEÑA, GOOGLE, ANDROID, IOS, CLAVE_ADMIN }
 
+@AllArgsConstructor
 @Data // Genera los Getters y Setters para mantener el código más limpio y ordenado
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)

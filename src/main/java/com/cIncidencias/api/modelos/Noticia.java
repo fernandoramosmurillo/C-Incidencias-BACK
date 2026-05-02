@@ -9,10 +9,12 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Data // Getters y Setters automáticos para un código más limpio y profesional
 @EqualsAndHashCode(callSuper = true)

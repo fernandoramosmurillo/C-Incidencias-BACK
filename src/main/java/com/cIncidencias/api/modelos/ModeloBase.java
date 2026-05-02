@@ -1,8 +1,12 @@
 package com.cIncidencias.api.modelos;
 
+import lombok.AllArgsConstructor;
+
 /**
  * Base para la gestión de estados y borrado lógico de las entidades.
  */
+
+@AllArgsConstructor
 public abstract class ModeloBase {
 
     public enum Estados { ACTIVO, ELIMINADO, EN_BORRADOR, BLOQUEADO, INACTIVO }
@@ -32,14 +36,6 @@ public abstract class ModeloBase {
 
     /** @param estado El nuevo estado que queremos asignar manualmente. */
     public void setEstado(Estados estado) { this.estado = estado; }
-
-    /**
-     * Constructor para inicializar la base con un estado concreto desde el principio.
-     */
-    public ModeloBase(Estados estado) {
-        super();
-        this.estado = estado;
-    }
 
     /**
      * Constructor por defecto. Por norma general, cualquier entidad 

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.firestore.DocumentReference;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 // Origen de la alerta para saber si viene de la propia incidencia, del sistema o de otro usuario
 enum TiposOrigen { SISTEMA, INCIDENCIA, USUARIO }
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Data // Getters y Setters automáticos para mantener el código más limpio y ordenado
 @EqualsAndHashCode(callSuper = true)

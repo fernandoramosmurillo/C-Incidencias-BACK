@@ -9,10 +9,12 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Data // Getters y Setters automáticos para mantener el código limpio y ordenado
 @EqualsAndHashCode(callSuper = true)
@@ -33,19 +35,4 @@ public class Comentario extends ModeloBase {
     @JsonSerialize(using = DocumentReferenceSerializer.class)
     @JsonDeserialize(using = DocumentReferenceDeserializer.class)
     private DocumentReference usuarioAutor;
-
-    /**
-     * Constructor para inicializar un comentario. 
-     * Recoge tanto el contenido del mensaje como los metadatos de autoría y privacidad 
-     * necesarios para que se muestren correctamente en el hilo de la incidencia.
-     */
-	public Comentario(String idComentario, String texto, Timestamp fechaPublicacion, Boolean esPrivado,
-			DocumentReference usuarioAutor) {
-		super();
-		this.idComentario = idComentario;
-		this.texto = texto;
-		this.fechaPublicacion = fechaPublicacion;
-		this.esPrivado = esPrivado;
-		this.usuarioAutor = usuarioAutor;
-	}
 }
