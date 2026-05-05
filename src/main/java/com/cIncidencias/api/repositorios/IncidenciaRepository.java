@@ -138,4 +138,17 @@ public class IncidenciaRepository implements IGenericoRepository<Incidencia> {
 	            false
 	    );
 	}
+	
+	/**
+	 * Verifica si una incidencia ya existe en la base de datos mediante su ID único.
+	 * @param idIncidencia El identificador a comprobar.
+	 * @return true si ya existe, false si está disponible.
+	 */
+	public boolean existePorId(String idIncidencia) throws InterruptedException, ExecutionException {
+	    DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idIncidencia);
+	    ApiFuture<DocumentSnapshot> query = docRef.get();
+	    
+	    // Si el documento existe en Firestore, retornamos true
+	    return query.get().exists();
+	}
 }

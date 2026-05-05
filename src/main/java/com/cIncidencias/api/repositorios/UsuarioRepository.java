@@ -147,4 +147,32 @@ public class UsuarioRepository implements IGenericoRepository<Usuario> {
 	            false
 	    );
 	}
+	
+	/**
+	 * Verifica si un usuario ya existe en la base de datos mediante su DNI.
+	 * Se asume que el DNI es el ID del documento en Firestore.
+	 * @param dni El documento de identidad a comprobar.
+	 * @return true si ya existe, false si está disponible.
+	 */
+	public boolean existePorDni(String dni) throws InterruptedException, ExecutionException {
+	    DocumentReference docRef = FIRESTORE.collection(COLECCION).document(dni);
+	    ApiFuture<DocumentSnapshot> query = docRef.get();
+	    
+	    // Si el documento existe en Firestore, retornamos true
+	    return query.get().exists();
+	}
+
+	/**
+	 * Verifica si un correo electrónico ya está registrado.
+	 * Se utiliza el email como ID del documento para mantener la coherencia.
+	 * @param email El correo a comprobar.
+	 * @return true si ya existe, false si está disponible.
+	 */
+	public boolean existePorEmail(String email) throws InterruptedException, ExecutionException {
+	    DocumentReference docRef = FIRESTORE.collection(COLECCION).document(email);
+	    ApiFuture<DocumentSnapshot> query = docRef.get();
+	    
+	    // Si el documento existe en Firestore, retornamos true
+	    return query.get().exists();
+	}
 }
