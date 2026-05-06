@@ -6,6 +6,8 @@ import com.cIncidencias.api.modelos.ModeloBase;
 import com.cIncidencias.api.modelos.Usuario;
 import com.cIncidencias.api.servicios.FirebaseAuthService;
 import com.cIncidencias.api.servicios.IGenericoService;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,9 @@ public class UsuarioController {
 
 	private final IGenericoService<Usuario> usuarioService;
 	private final FirebaseAuthService authService;
+	
+	@Value("${app.security.public-key}")
+    private String miClaveMaestra;
 
 	/**
 	 * Inyectamos el servicio para gestionar toda la lógica de los usuarios.
@@ -91,6 +96,27 @@ public class UsuarioController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	
+	@GetMapping("/publico")
+	public ResponseEntity<List<Usuario>> listarPublico(
+	        @RequestHeader(value = "X-App-Config", required = false) String secret
+	) {
+	    if (miClaveMaestra == null || !miClaveMaestra.equals(secret)) {
+	        // Si la clave no coincide o no se ha cargado la variable, 404.
+	        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+	    }
+
+	    try {
+	        List<Usuario> lista = usuarioService.obtenerTodos();
+	        return new ResponseEntity<>(lista, HttpStatus.OK);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
+	}
+	
+	
 	
 	/**
 	 * Da de alta a un nuevo usuario en el sistema.
