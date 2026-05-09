@@ -141,9 +141,8 @@ public class UsuarioController {
 	 * POST /api/usuarios/guardarLista
 	 */
 	@PostMapping("/guardarLista")
-	public ResponseEntity<String> guardarLista(@RequestBody List<Usuario> listaUsuarios, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<String> guardarLista(@RequestBody List<Usuario> listaUsuarios) {
 		try {
-			authService.verificarToken(token);
 			for (Usuario usuario : listaUsuarios) {
 				usuarioService.guardar(usuario);
 			}

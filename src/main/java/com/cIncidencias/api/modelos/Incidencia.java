@@ -53,13 +53,13 @@ public class Incidencia extends ModeloBase {
 	private String idIncidencia;
 	private String titulo;
 	private String descripcion;
-	public String categorias;
+	public List<String> categorias;
 
 	@JsonSerialize(using = GeoPointSerializer.class)
 	@JsonDeserialize(using = GeoPointDeserializer.class)
 	private GeoPoint ubicacion; // Punto geográfico exacto para localizar el problema en el mapa
 
-	private List<String> imagenesUrl; // Enlace a la foto que el ciudadano sube como evidencia
+	private List<String> imagenesUrl; // Enlaces a la fotos que el ciudadano sube como evidencia
 
 	@JsonSerialize(using = TimestampSerializer.class)
 	@JsonDeserialize(using = TimestampDeserializer.class)
