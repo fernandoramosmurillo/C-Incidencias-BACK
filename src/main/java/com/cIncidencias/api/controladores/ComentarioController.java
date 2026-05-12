@@ -97,20 +97,15 @@ public class ComentarioController {
 	 * Actualiza los datos de un comentario existente. PUT /api/comentarios
 	 */
 	@PutMapping("/{id}")
-	public ResponseEntity<String> modificar(
-	        @PathVariable("id") String id, 
-	        @RequestBody Comentario comentario, 
-	        @RequestHeader("Authorization") String token) {
-	    try {
-	        String idToken = token.startsWith("Bearer ") ? token.substring(7) : token;
-	        authService.verificarToken(idToken);
-	        
-	        comentarioService.modificar(comentario);
-	        
-	        return new ResponseEntity<>("Actualizado correctamente", HttpStatus.OK);
-	    } catch (Exception e) {
-	        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-	    }
+	public ResponseEntity<String> modificar(@PathVariable("id") String id, @RequestBody Comentario comentario, @RequestHeader("Authorization") String token) {
+		try {
+			authService.verificarToken(token);
+			comentarioService.modificar(comentario);
+			return new ResponseEntity<>("Actualizado correctamente", HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	/**

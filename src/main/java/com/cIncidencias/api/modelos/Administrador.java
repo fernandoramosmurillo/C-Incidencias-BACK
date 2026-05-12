@@ -27,7 +27,7 @@ enum Departamentos {
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true) // Comprueba los datos del padre (Usuario) al hacer comparaciones
-public class Administrador extends Usuario {
+public class Administrador extends Ciudadano {
 
 	// Controles de seguridad y niveles de gestión
 	private Integer nivelAcceso; // Rango de poder dentro del panel de control
@@ -63,7 +63,7 @@ public class Administrador extends Usuario {
 			Timestamp fechaCambioClave, String claveAdmin, List<DocumentReference> listaNoticiasEnviadas) {
 		super(estado, idUsuario, nombre, apellidos, correoElectronico, clave, fechaNacimiento, rolUsuario,
 				fotoPerfilUrl, tipoAcceso, bloqueado, recibirNotificaciones, fechaCreacion, fechaEliminacion,
-				notificacionesRecibidas);
+				notificacionesRecibidas, claveAdmin, claveAdmin, claveAdmin, listaNoticiasEnviadas, listaNoticiasEnviadas);
 		this.nivelAcceso = nivelAcceso;
 		this.intentosPushDenegados = intentosPushDenegados;
 		this.esSuperAdmin = esSuperAdmin;

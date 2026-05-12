@@ -101,20 +101,15 @@ public class NotificacionController {
 	 * Requiere token de autorización.
 	 */
 	@PutMapping("/{id}")
-	public ResponseEntity<String> modificar(
-	        @PathVariable("id") String id, 
-	        @RequestBody Notificacion notificacion, 
-	        @RequestHeader("Authorization") String token) {
-	    try {
-	        String idToken = token.startsWith("Bearer ") ? token.substring(7) : token;
-	        authService.verificarToken(idToken);
-	        
-	        notificacionService.modificar(notificacion);
-	        
-	        return new ResponseEntity<>("Notificación actualizada correctamente", HttpStatus.OK);
-	    } catch (Exception e) {
-	        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-	    }
+	public ResponseEntity<String> modificar(@PathVariable("id") String id, @RequestBody Notificacion notificacion, @RequestHeader("Authorization") String token) {
+		try {
+			authService.verificarToken(token);
+			notificacionService.modificar(notificacion);
+			return new ResponseEntity<>("Notificación actualizada correctamente", HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	/**

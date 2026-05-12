@@ -100,16 +100,13 @@ public class IncidenciaController {
 	 * /api/incidencias
 	 */
 	@PutMapping("/{id}")
-	public ResponseEntity<String> modificar(@PathVariable("id") String id, @RequestBody Incidencia incidencia,
-			@RequestHeader("Authorization") String token) {
+	public ResponseEntity<String> modificar(@PathVariable("id") String id, @RequestBody Incidencia incidencia, @RequestHeader("Authorization") String token) {
 		try {
-			String idToken = token.startsWith("Bearer ") ? token.substring(7) : token;
-			authService.verificarToken(idToken);
-
+			authService.verificarToken(token);
 			incidenciaService.modificar(incidencia);
-
 			return new ResponseEntity<>("Incidencia actualizada correctamente", HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}

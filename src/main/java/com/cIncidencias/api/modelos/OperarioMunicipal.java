@@ -27,7 +27,7 @@ enum Especialidades {
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true) // Se encarga de comprobar los datos del padre cuando haga un equals o hash
-public class OperarioMunicipal extends Usuario {
+public class OperarioMunicipal extends Ciudadano {
     
     // Atributos específicos del puesto de trabajo
     private Especialidades especialidad; // El oficio principal del operario
@@ -58,7 +58,7 @@ public class OperarioMunicipal extends Usuario {
 			Integer numeroCuadrilla, Integer incidenciasResueltas, List<DocumentReference> listaIncidenciasAsignadas) {
 		super(estado, idUsuario, nombre, apellidos, correoElectronico, clave, fechaNacimiento, rolUsuario,
 				fotoPerfilUrl, tipoAcceso, bloqueado, recibirNotificaciones, fechaCreacion, fechaEliminacion,
-				notificacionesRecibidas);
+				notificacionesRecibidas, telefonoTrabajo, telefonoTrabajo, telefonoTrabajo, listaIncidenciasAsignadas, listaIncidenciasAsignadas);
 		this.especialidad = especialidad;
 		this.disponible = disponible;
 		this.carnetConducir = carnetConducir;
