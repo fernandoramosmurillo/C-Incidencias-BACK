@@ -157,16 +157,21 @@ public class UsuarioController {
 	 * Actualiza la información (nombre, apellidos, etc.) de un perfil que ya existe.
 	 * PUT /api/usuarios
 	 */
-	@PutMapping
-	public ResponseEntity<String> modificar(@RequestBody Usuario usuario, @RequestHeader("Authorization") String token) {
-		try {
-			authService.verificarToken(token);
-			usuarioService.modificar(usuario);
-			return new ResponseEntity<>("Perfil de usuario actualizado correctamente", HttpStatus.OK);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
+	@PutMapping("/{id}")
+	public ResponseEntity<String> modificar(
+	        @PathVariable("id") String id, 
+	        @RequestBody Usuario usuario, 
+	        @RequestHeader("Authorization") String token) {
+	    try {
+	        String idToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+	        authService.verificarToken(idToken);
+	        
+	        usuarioService.modificar(usuario);
+	        
+	        return new ResponseEntity<>("Perfil de usuario actualizado correctamente", HttpStatus.OK);
+	    } catch (Exception e) {
+	        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	    }
 	}
 
 	/**

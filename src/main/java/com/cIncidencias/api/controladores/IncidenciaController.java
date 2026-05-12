@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Controlador REST para la gestión de incidencias.
- * Conecta las peticiones externas con la lógica de negocio de IncidenciaService.
+ * Controlador REST para la gestión de incidencias. Conecta las peticiones
+ * externas con la lógica de negocio de IncidenciaService.
  */
 @RestController
 @RequestMapping("/api/incidencias")
@@ -31,8 +31,7 @@ public class IncidenciaController {
 	}
 
 	/**
-	 * Devuelve la lista completa de todas las incidencias.
-	 * GET /api/incidencias
+	 * Devuelve la lista completa de todas las incidencias. GET /api/incidencias
 	 */
 	@GetMapping
 	public ResponseEntity<List<Incidencia>> listar(@RequestHeader("Authorization") String token) {
@@ -47,16 +46,15 @@ public class IncidenciaController {
 	}
 
 	/**
-	 * Busca una incidencia concreta usando su ID único.
-	 * GET /api/incidencias/{id}
+	 * Busca una incidencia concreta usando su ID único. GET /api/incidencias/{id}
 	 */
 	@GetMapping("/{id}")
-	public ResponseEntity<Incidencia> obtenerPorId(@PathVariable("id") String id, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<Incidencia> obtenerPorId(@PathVariable("id") String id,
+			@RequestHeader("Authorization") String token) {
 		try {
 			authService.verificarToken(token);
 			Incidencia incidencia = incidenciaService.obtenerPorId(id);
-			return (incidencia != null) 
-					? new ResponseEntity<>(incidencia, HttpStatus.OK) 
+			return (incidencia != null) ? new ResponseEntity<>(incidencia, HttpStatus.OK)
 					: new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -65,11 +63,11 @@ public class IncidenciaController {
 	}
 
 	/**
-	 * Registra una nueva incidencia en el sistema.
-	 * POST /api/incidencias
+	 * Registra una nueva incidencia en el sistema. POST /api/incidencias
 	 */
 	@PostMapping
-	public ResponseEntity<String> guardar(@RequestBody Incidencia incidencia, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<String> guardar(@RequestBody Incidencia incidencia,
+			@RequestHeader("Authorization") String token) {
 		try {
 			authService.verificarToken(token);
 			incidenciaService.guardar(incidencia);
@@ -81,12 +79,11 @@ public class IncidenciaController {
 	}
 
 	/**
-	 * ¡Ojo! Este método es solo para cargar datos de bulto. 
-	 * Se mantiene público según lo solicitado.
-	 * POST /api/incidencias/guardarLista
+	 * ¡Ojo! Este método es solo para cargar datos de bulto. Se mantiene público
+	 * según lo solicitado. POST /api/incidencias/guardarLista
 	 */
 	@PostMapping("/guardarLista")
-	public ResponseEntity<String> guardarLista(@RequestBody List<Incidencia> listaIncidencias){
+	public ResponseEntity<String> guardarLista(@RequestBody List<Incidencia> listaIncidencias) {
 		try {
 			for (Incidencia incidencia : listaIncidencias) {
 				incidenciaService.guardar(incidencia);
@@ -97,29 +94,32 @@ public class IncidenciaController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	/**
-	 * Permite modificar los datos de una incidencia que ya existe.
-	 * PUT /api/incidencias
+	 * Permite modificar los datos de una incidencia que ya existe. PUT
+	 * /api/incidencias
 	 */
-	@PutMapping
-	public ResponseEntity<String> modificar(@RequestBody Incidencia incidencia, @RequestHeader("Authorization") String token) {
+	@PutMapping("/{id}")
+	public ResponseEntity<String> modificar(@PathVariable("id") String id, @RequestBody Incidencia incidencia,
+			@RequestHeader("Authorization") String token) {
 		try {
-			authService.verificarToken(token);
+			String idToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+			authService.verificarToken(idToken);
+
 			incidenciaService.modificar(incidencia);
+
 			return new ResponseEntity<>("Incidencia actualizada correctamente", HttpStatus.OK);
 		} catch (Exception e) {
-			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	/**
-	 * Borra el registro de una incidencia por su ID.
-	 * DELETE /api/incidencias/{id}
+	 * Borra el registro de una incidencia por su ID. DELETE /api/incidencias/{id}
 	 */
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> eliminar(@PathVariable("id") String id, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<String> eliminar(@PathVariable("id") String id,
+			@RequestHeader("Authorization") String token) {
 		try {
 			authService.verificarToken(token);
 			incidenciaService.eliminar(id);
@@ -129,13 +129,14 @@ public class IncidenciaController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	/**
-	 * Actualiza el estado lógico (Activo, Eliminado, etc.).
-	 * PUT /api/incidencias/{id}/estado/{estado}
+	 * Actualiza el estado lógico (Activo, Eliminado, etc.). PUT
+	 * /api/incidencias/{id}/estado/{estado}
 	 */
 	@PutMapping("/{id}/estado/{estado}")
-	public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable ModeloBase.Estados estado, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable ModeloBase.Estados estado,
+			@RequestHeader("Authorization") String token) {
 		try {
 			authService.verificarToken(token);
 			incidenciaService.cambiarEstado(id, estado);

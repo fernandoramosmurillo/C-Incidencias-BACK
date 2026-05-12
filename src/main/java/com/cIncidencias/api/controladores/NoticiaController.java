@@ -97,16 +97,21 @@ public class NoticiaController {
 	/**
 	 * Modifica los datos de una noticia que ya esté publicada.
 	 */
-	@PutMapping
-	public ResponseEntity<String> modificar(@RequestBody Noticia noticia, @RequestHeader("Authorization") String token) {
-		try {
-			authService.verificarToken(token);
-			noticiaService.modificar(noticia);
-			return new ResponseEntity<>("Noticia actualizada correctamente", HttpStatus.OK);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
+	@PutMapping("/{id}")
+	public ResponseEntity<String> modificar(
+	        @PathVariable("id") String id, 
+	        @RequestBody Noticia noticia, 
+	        @RequestHeader("Authorization") String token) {
+	    try {
+	        String idToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+	        authService.verificarToken(idToken);
+	        
+	        noticiaService.modificar(noticia);
+	        
+	        return new ResponseEntity<>("Noticia actualizada correctamente", HttpStatus.OK);
+	    } catch (Exception e) {
+	        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	    }
 	}
 
 	/**

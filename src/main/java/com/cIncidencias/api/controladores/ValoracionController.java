@@ -97,16 +97,21 @@ public class ValoracionController {
 	/**
 	 * Permite editar una valoración.
 	 */
-	@PutMapping
-	public ResponseEntity<String> modificar(@RequestBody Valoracion valoracion, @RequestHeader("Authorization") String token) {
-		try {
-			authService.verificarToken(token);
-			valoracionService.modificar(valoracion);
-			return new ResponseEntity<>("Valoración actualizada correctamente", HttpStatus.OK);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
+	@PutMapping("/{id}")
+	public ResponseEntity<String> modificar(
+	        @PathVariable("id") String id, 
+	        @RequestBody Valoracion valoracion, 
+	        @RequestHeader("Authorization") String token) {
+	    try {
+	        String idToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+	        authService.verificarToken(idToken);
+	        
+	        valoracionService.modificar(valoracion);
+	        
+	        return new ResponseEntity<>("Valoración actualizada correctamente", HttpStatus.OK);
+	    } catch (Exception e) {
+	        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	    }
 	}
 
 	/**
