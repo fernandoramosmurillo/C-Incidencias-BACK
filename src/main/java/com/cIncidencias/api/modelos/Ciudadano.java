@@ -23,7 +23,6 @@ public class Ciudadano extends Usuario {
 
     private String dni;
     private String telefonoContacto;
-    private String direccion;
     
     // Inicialización directa para evitar NullPointerException
     @JsonSerialize(contentUsing = DocumentReferenceSerializer.class)
@@ -52,7 +51,6 @@ public class Ciudadano extends Usuario {
         
         this.dni = dni;
         this.telefonoContacto = telefonoContacto;
-        this.direccion = direccion;
         
         // Validación en el constructor para asegurar que si pasan null por parámetro, se mantenga la lista vacía
         this.incidenciasSolicitadas = (incidenciasSolicitadas != null) ? incidenciasSolicitadas : new ArrayList<>();
