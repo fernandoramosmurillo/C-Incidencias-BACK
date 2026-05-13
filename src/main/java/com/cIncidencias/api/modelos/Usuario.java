@@ -83,32 +83,10 @@ public class Usuario extends ModeloBase {
 	@JsonSerialize(contentUsing = DocumentReferenceSerializer.class)
 	@JsonDeserialize(contentUsing = DocumentReferenceDeserializer.class)
 	protected List<DocumentReference> notificacionesRecibidas = new ArrayList<>();
-
-	/**
-	 * Constructor base para la entidad Usuario. Recoge toda la información común de
-	 * los perfiles del sistema. He incluido la validación de la lista de
-	 * notificaciones para asegurar que, aunque la cuenta sea nueva, el objeto esté
-	 * listo para registrar avisos sin fallos de puntero nulo.
-	 */
-	public Usuario(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
-			Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl, TiposAcceso tipoAcceso,
-			Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion, Timestamp fechaEliminacion,
-			List<DocumentReference> notificacionesRecibidas) {
-		super(estado);
-		this.idUsuario = idUsuario;
-		this.nombre = nombre;
-		this.apellidos = apellidos;
-		this.correoElectronico = correoElectronico;
-		this.fechaNacimiento = fechaNacimiento;
-		this.rolUsuario = rolUsuario;
-		this.fotoPerfilUrl = fotoPerfilUrl;
-		this.tipoAcceso = tipoAcceso;
-		this.bloqueado = bloqueado;
-		this.recibirNotificaciones = recibirNotificaciones;
-		this.fechaCreacion = fechaCreacion;
-		this.fechaEliminacion = fechaEliminacion;
-
-		// Si el listado viene nulo de la base de datos, lo inicializamos vacío
-		this.notificacionesRecibidas = (notificacionesRecibidas != null) ? notificacionesRecibidas : new ArrayList<>();
-	}
+    private Integer intentosPushDenegados; // Registro de seguridad sobre login fallidos
+    
+	@JsonSerialize(using = TimestampSerializer.class)
+	@JsonDeserialize(using = TimestampDeserializer.class)
+	private Timestamp fechaCambioClave;
+	
 }
