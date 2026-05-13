@@ -27,7 +27,7 @@ enum RolesUsuario {
 }
 
 enum TiposAcceso {
-	CORREO_CONTRASEÑA, GOOGLE, ANDROID, IOS, CLAVE_ADMIN
+	CORREO_CONTRASEÑA, EXTERNO, CLAVE_ADMIN, CODIGO
 }
 
 @AllArgsConstructor
@@ -36,18 +36,17 @@ enum TiposAcceso {
 @EqualsAndHashCode(callSuper = true)
 
 //Esta anotacion sirve para que java sepa que debe hacer en caso de que se le pase un modelo mas especifico que usuario
-@JsonTypeInfo(
-		  use = JsonTypeInfo.Id.NAME, //Indica que usaremos un (un String) para identificar qué tipo de hijo es.
-		  include = JsonTypeInfo.As.PROPERTY, //Le indica que ese nombre vendrá dentro del propio JSON como una propiedad más.
-		  property = "rolUsuario", // El campo que define el tipo
-		  visible = true //Permite que la propieda que identifica los tipos tambien se incluya en el json
-		)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, // Indica que usaremos un (un String) para identificar qué tipo de hijo es.
+		include = JsonTypeInfo.As.PROPERTY, // Le indica que ese nombre vendrá dentro del propio JSON como una propiedad
+											// más.
+		property = "rolUsuario", // El campo que define el tipo
+		visible = true // Permite que la propieda que identifica los tipos tambien se incluya en el
+						// json
+)
 //Esta anotacion sirve para indicarle a java que clase son subtipos y que debe de usar
-@JsonSubTypes({
-		  @JsonSubTypes.Type(value = Ciudadano.class, name = "CIUDADANO"),
-		  @JsonSubTypes.Type(value = OperarioMunicipal.class, name = "OPERARIO"),
-		  @JsonSubTypes.Type(value = Administrador.class, name = "ADMINISTRADOR")
-		})
+@JsonSubTypes({ @JsonSubTypes.Type(value = Ciudadano.class, name = "CIUDADANO"),
+		@JsonSubTypes.Type(value = OperarioMunicipal.class, name = "OPERARIO"),
+		@JsonSubTypes.Type(value = Administrador.class, name = "ADMINISTRADOR") })
 
 public class Usuario extends ModeloBase {
 
@@ -92,9 +91,9 @@ public class Usuario extends ModeloBase {
 	 * listo para registrar avisos sin fallos de puntero nulo.
 	 */
 	public Usuario(Estados estado, String idUsuario, String nombre, String apellidos, String correoElectronico,
-			String clave, Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl,
-			TiposAcceso tipoAcceso, Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion,
-			Timestamp fechaEliminacion, List<DocumentReference> notificacionesRecibidas) {
+			Timestamp fechaNacimiento, RolesUsuario rolUsuario, String fotoPerfilUrl, TiposAcceso tipoAcceso,
+			Boolean bloqueado, Boolean recibirNotificaciones, Timestamp fechaCreacion, Timestamp fechaEliminacion,
+			List<DocumentReference> notificacionesRecibidas) {
 		super(estado);
 		this.idUsuario = idUsuario;
 		this.nombre = nombre;

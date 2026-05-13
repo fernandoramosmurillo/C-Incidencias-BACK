@@ -45,7 +45,7 @@ public class Ciudadano extends Usuario {
             String telefonoContacto, String direccion, List<DocumentReference> incidenciasSolicitadas,
             List<DocumentReference> incidenciasCalificadas) {
         
-        super(estado, idUsuario, nombre, apellidos, correoElectronico, clave, fechaNacimiento, rolUsuario,
+        super(estado, idUsuario, nombre, apellidos, correoElectronico, fechaNacimiento, rolUsuario,
                 fotoPerfilUrl, tipoAcceso, bloqueado, recibirNotificaciones, fechaCreacion, fechaEliminacion,
                 notificacionesRecibidas);
         
