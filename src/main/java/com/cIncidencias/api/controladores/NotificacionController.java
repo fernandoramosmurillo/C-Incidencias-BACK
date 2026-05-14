@@ -1,6 +1,7 @@
 package com.cIncidencias.api.controladores;
 
 import com.cIncidencias.api.modelos.Notificacion;
+import com.cIncidencias.api.servicios.FirebaseAuthService;
 import com.cIncidencias.api.servicios.IGenericoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,21 +19,24 @@ import java.util.List;
 public class NotificacionController {
 
 	private final IGenericoService<Notificacion> notificacionService;
+	private final FirebaseAuthService authService;
 
 	/**
-	 * Constructor para inyectar el servicio. Spring se encarga de todo el lío.
+	 * Constructor para inyectar el servicio de notificaciones y el de seguridad.
 	 */
-	public NotificacionController(IGenericoService<Notificacion> notificacionService) {
+	public NotificacionController(IGenericoService<Notificacion> notificacionService, FirebaseAuthService authService) {
 		this.notificacionService = notificacionService;
+		this.authService = authService;
 	}
 
 	/**
 	 * Recupera todas las notificaciones del sistema. 
-	 * Se usa sobre todo para que los administradores vean el histórico de avisos.
+	 * Requiere token de autorización.
 	 */
 	@GetMapping
-	public ResponseEntity<List<Notificacion>> listar() {
+	public ResponseEntity<List<Notificacion>> listar(@RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			List<Notificacion> lista = notificacionService.obtenerTodos();
 			return new ResponseEntity<>(lista, HttpStatus.OK);
 		} catch (Exception e) {
@@ -43,10 +47,12 @@ public class NotificacionController {
 
 	/**
 	 * Busca un aviso concreto por su ID para ver los detalles.
+	 * Requiere token de autorización.
 	 */
 	@GetMapping("/{id}")
-	public ResponseEntity<Notificacion> obtenerPorId(@PathVariable("id") String id) {
+	public ResponseEntity<Notificacion> obtenerPorId(@PathVariable("id") String id, @RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			Notificacion notificacion = notificacionService.obtenerPorId(id);
 			return (notificacion != null) 
 					? new ResponseEntity<>(notificacion, HttpStatus.OK) 
@@ -59,10 +65,12 @@ public class NotificacionController {
 
 	/**
 	 * Lanza una nueva notificación. Se usa para avisar a los vecinos o a los técnicos.
+	 * Requiere token de autorización.
 	 */
 	@PostMapping
-	public ResponseEntity<String> guardar(@RequestBody Notificacion notificacion) {
+	public ResponseEntity<String> guardar(@RequestBody Notificacion notificacion, @RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			notificacionService.guardar(notificacion);
 			return new ResponseEntity<>("Notificación enviada con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
@@ -73,7 +81,7 @@ public class NotificacionController {
 
 	/**
 	 * ¡Advertencia! Este método es solo para meter datos de prueba rápido.
-	 * Registra una lista de notificaciones de forma masiva.
+	 * Se mantiene público para facilitar el desarrollo.
 	 */
 	@PostMapping("/guardarLista")
 	public ResponseEntity<String> guardarLista(@RequestBody List<Notificacion> listaNotificaciones) {
@@ -89,11 +97,13 @@ public class NotificacionController {
 	}
 
 	/**
-	 * Sirve para retocar una notificación, como cuando queremos cambiar un texto o estado.
+	 * Sirve para retocar una notificación.
+	 * Requiere token de autorización.
 	 */
-	@PutMapping
-	public ResponseEntity<String> modificar(@RequestBody Notificacion notificacion) {
+	@PutMapping("/{id}")
+	public ResponseEntity<String> modificar(@PathVariable("id") String id, @RequestBody Notificacion notificacion, @RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			notificacionService.modificar(notificacion);
 			return new ResponseEntity<>("Notificación actualizada correctamente", HttpStatus.OK);
 		} catch (Exception e) {
@@ -104,10 +114,12 @@ public class NotificacionController {
 
 	/**
 	 * Borra el aviso del sistema definitivamente usando su identificador.
+	 * Requiere token de autorización.
 	 */
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> eliminar(@PathVariable("id") String id) {
+	public ResponseEntity<String> eliminar(@PathVariable("id") String id, @RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			notificacionService.eliminar(id);
 			return new ResponseEntity<>("Notificación eliminada", HttpStatus.OK);
 		} catch (Exception e) {

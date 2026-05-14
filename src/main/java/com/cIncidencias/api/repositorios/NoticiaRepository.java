@@ -143,4 +143,19 @@ public class NoticiaRepository implements IGenericoRepository<Noticia> {
 	            false
 	    );
 	}
+	
+	/**
+	 * Verifica si una noticia ya existe en Firestore utilizando su identificador.
+	 * Mantiene la coherencia técnica con el resto de repositorios del sistema.
+	 * @param idNoticia El identificador único de la noticia.
+	 * @return true si la noticia existe, false en caso contrario.
+	 */
+	public boolean existePorId(String idNoticia) throws InterruptedException, ExecutionException {
+	    DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idNoticia);
+	    
+	    ApiFuture<DocumentSnapshot> query = docRef.get();
+
+	    // Si el documento existe en la colección de noticias, retornamos true
+	    return query.get().exists();
+	}
 }

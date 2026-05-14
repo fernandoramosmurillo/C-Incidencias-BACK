@@ -2,6 +2,7 @@ package com.cIncidencias.api.controladores;
 
 import com.cIncidencias.api.modelos.Comentario;
 import com.cIncidencias.api.modelos.ModeloBase;
+import com.cIncidencias.api.servicios.FirebaseAuthService;
 import com.cIncidencias.api.servicios.IGenericoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,20 +20,23 @@ import java.util.List;
 public class ComentarioController {
 
 	private final IGenericoService<Comentario> comentarioService;
+	private final FirebaseAuthService authService;
 
 	/**
-	 * Inyectamos el servicio genérico para manejar los comentarios.
+	 * Inyectamos el servicio genérico para manejar los comentarios y el servicio de autenticación.
 	 */
-	public ComentarioController(IGenericoService<Comentario> comentarioService) {
+	public ComentarioController(IGenericoService<Comentario> comentarioService, FirebaseAuthService authService) {
 		this.comentarioService = comentarioService;
+		this.authService = authService;
 	}
 
 	/**
 	 * Obtiene el listado de todos los comentarios registrados. GET /api/comentarios
 	 */
 	@GetMapping
-	public ResponseEntity<List<Comentario>> listar() {
+	public ResponseEntity<List<Comentario>> listar(@RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			List<Comentario> lista = comentarioService.obtenerTodos();
 			return new ResponseEntity<>(lista, HttpStatus.OK);
 		} catch (Exception e) {
@@ -45,8 +49,9 @@ public class ComentarioController {
 	 * Busca un comentario específico por su ID. GET /api/comentarios/{id}
 	 */
 	@GetMapping("/{id}")
-	public ResponseEntity<Comentario> obtenerPorId(@PathVariable("id") String id) {
+	public ResponseEntity<Comentario> obtenerPorId(@PathVariable("id") String id, @RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			Comentario comentario = comentarioService.obtenerPorId(id);
 			return (comentario != null) ? new ResponseEntity<>(comentario, HttpStatus.OK)
 					: new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -60,8 +65,9 @@ public class ComentarioController {
 	 * Crea un nuevo comentario. POST /api/comentarios
 	 */
 	@PostMapping
-	public ResponseEntity<String> guardar(@RequestBody Comentario comentario) {
+	public ResponseEntity<String> guardar(@RequestBody Comentario comentario, @RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			comentarioService.guardar(comentario);
 			return new ResponseEntity<>("Comentario registrado con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
@@ -71,7 +77,7 @@ public class ComentarioController {
 	}
 
 	/**
-	 * Este método lo usamos para volcar datos de prueba rápidamente. 
+	 * Este método se mantiene público para volcar datos de prueba rápidamente. 
 	 * POST /api/comentarios/guardarLista
 	 */
 	@PostMapping("/guardarLista")
@@ -90,11 +96,12 @@ public class ComentarioController {
 	/**
 	 * Actualiza los datos de un comentario existente. PUT /api/comentarios
 	 */
-	@PutMapping
-	public ResponseEntity<String> modificar(@RequestBody Comentario comentario) {
+	@PutMapping("/{id}")
+	public ResponseEntity<String> modificar(@PathVariable("id") String id, @RequestBody Comentario comentario, @RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			comentarioService.modificar(comentario);
-			return new ResponseEntity<>("Comentario actualizado correctamente", HttpStatus.OK);
+			return new ResponseEntity<>("Actualizado correctamente", HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -105,8 +112,9 @@ public class ComentarioController {
 	 * Elimina un comentario por su ID. DELETE /api/comentarios/{id}
 	 */
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> eliminar(@PathVariable("id") String id) {
+	public ResponseEntity<String> eliminar(@PathVariable("id") String id, @RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			comentarioService.eliminar(id);
 			return new ResponseEntity<>("Comentario eliminado", HttpStatus.OK);
 		} catch (Exception e) {
@@ -120,13 +128,14 @@ public class ComentarioController {
 	 * sin necesidad de borrar el registro completo.
 	 */
 	@PutMapping("/{id}/estado/{estado}")
-	public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable ModeloBase.Estados estado) {
-	    try {
-	        comentarioService.cambiarEstado(id, estado);
-	        return new ResponseEntity<>("Estado del comentario actualizado a: " + estado, HttpStatus.OK);
-	    } catch (Exception e) {
-	    	e.printStackTrace();
-	        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-	    }
+	public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable ModeloBase.Estados estado, @RequestHeader("Authorization") String token) {
+		try {
+			authService.verificarToken(token);
+			comentarioService.cambiarEstado(id, estado);
+			return new ResponseEntity<>("Estado del comentario actualizado a: " + estado, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

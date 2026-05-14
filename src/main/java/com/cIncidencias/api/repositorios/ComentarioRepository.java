@@ -139,4 +139,17 @@ public class ComentarioRepository implements IGenericoRepository<Comentario> {
 	            false
 	    );
 	}
+	
+	/**
+	 * Verifica si un comentario ya existe en la base de datos mediante su ID único.
+	 * @param idComentario El identificador (PK) a comprobar.
+	 * @return true si ya existe, false si está disponible.
+	 */
+	public boolean existePorId(String idComentario) throws InterruptedException, ExecutionException {
+	    DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idComentario);
+	    ApiFuture<DocumentSnapshot> query = docRef.get();
+	    
+	    // Si el documento existe en Firestore, retornamos true
+	    return query.get().exists();
+	}
 }

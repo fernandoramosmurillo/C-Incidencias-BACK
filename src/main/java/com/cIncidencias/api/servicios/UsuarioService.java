@@ -1,5 +1,6 @@
 package com.cIncidencias.api.servicios;
 
+import com.cIncidencias.api.modelos.Ciudadano;
 import com.cIncidencias.api.modelos.ModeloBase;
 import com.cIncidencias.api.modelos.Usuario;
 import com.cIncidencias.api.repositorios.UsuarioRepository;
@@ -25,50 +26,44 @@ public class UsuarioService implements IGenericoService<Usuario> {
 	}
 
 	/**
-	 * Valida y registra un nuevo usuario en Firestore.
-	 * Verifica que el nombre, apellidos y email sean válidos antes de persistir la información.
-	 * @param usuario Objeto Usuario con la información de perfil.
-	 * @throws NullParamsException Si faltan datos obligatorios o el formato de email es incorrecto.
-	 * @throws ExecutionException Si ocurre un error en la tarea asíncrona de Firestore.
-	 * @throws InterruptedException Si se interrumpe el hilo de ejecución.
-	 * @throws IOException Si falla el registro en el log local.
+	 * Valida y registra un nuevo usuario.
+	 * Se realiza un casteo a Ciudadano para verificar el DNI si el objeto lo permite.
 	 */
 	@Override
 	public void guardar(Usuario usuario) throws NullParamsException, ExecutionException, InterruptedException, IOException {
-		if (usuario == null) {
-			throw new NullParamsException("No se puede registrar un usuario nulo.");
-		}
-		
-		if (usuario.getNombre() == null || usuario.getNombre().trim().isEmpty()) {
-			throw new NullParamsException("El nombre del usuario es obligatorio.");
-		}
-		
-		if (usuario.getCorreoElectronico() == null || !usuario.getCorreoElectronico().contains("@")) {
-			throw new NullParamsException("El email proporcionado no es válido.");
-		}
+	    if (usuario == null) {
+	        throw new NullParamsException("No se puede registrar un usuario nulo.");
+	    }
 
-		usuarioRepository.guardar(usuario);
+	    // Solo validamos DNI si el usuario que llega es realmente un Ciudadano
+	    if (usuario instanceof Ciudadano) {
+	        Ciudadano ciudadano = (Ciudadano) usuario;
+	        if (ciudadano.getDni() == null || usuarioRepository.existePorDni(ciudadano.getDni())) {
+	            throw new NullParamsException("El DNI ya se encuentra registrado o no es válido.");
+	        }
+	    }
+
+	    // Validaciones comunes para todos (Ciudadano, Operario, Admin)
+	    if (usuario.getNombre() == null || usuario.getNombre().trim().isEmpty()) {
+	        throw new NullParamsException("El nombre del usuario es obligatorio.");
+	    }
+	    
+	    if (usuario.getCorreoElectronico() == null || !usuario.getCorreoElectronico().contains("@")) {
+	        throw new NullParamsException("El email proporcionado no es válido.");
+	    }
+	    
+	    if (usuarioRepository.existePorEmail(usuario.getCorreoElectronico())) {
+	        throw new NullParamsException("El correo electrónico ya está en uso.");
+	    }
+
+	    usuarioRepository.guardar(usuario);
 	}
 
-	/**
-	 * Recupera el listado completo de usuarios registrados en la plataforma.
-	 * @return Lista de objetos Usuario.
-	 * @throws ExecutionException Si hay un fallo al obtener los datos del servidor.
-	 * @throws InterruptedException Si se interrumpe la conexión con Firestore.
-	 */
 	@Override
 	public List<Usuario> obtenerTodos() throws ExecutionException, InterruptedException {
 		return usuarioRepository.obtenerTodos();
 	}
 
-	/**
-	 * Busca un usuario específico mediante su identificador único (UID).
-	 * @param idUsuario Identificador único del usuario.
-	 * @return El objeto Usuario encontrado o null si no existe.
-	 * @throws NullParamsException Si el ID es nulo o está vacío.
-	 * @throws ExecutionException Si la consulta falla en el servidor.
-	 * @throws InterruptedException Si se corta la comunicación asíncrona.
-	 */
 	@Override
 	public Usuario obtenerPorId(String idUsuario) throws NullParamsException, ExecutionException, InterruptedException {
 		if (idUsuario == null || idUsuario.trim().isEmpty()) {
@@ -77,49 +72,44 @@ public class UsuarioService implements IGenericoService<Usuario> {
 		return usuarioRepository.obtenerPorId(idUsuario);
 	}
 
-	/**
-	 * Elimina permanentemente el perfil de un usuario del sistema tras validar su ID.
-	 * @param idUsuario ID del usuario a eliminar.
-	 * @throws NullParamsException Si el ID es nulo o está vacío.
-	 * @throws ExecutionException Si el borrado falla en la base de datos.
-	 * @throws InterruptedException Si el proceso es interrumpido.
-	 * @throws IOException Si ocurre un error al registrar la acción en el log.
-	 */
 	@Override
 	public void eliminar(String idUsuario) throws NullParamsException, ExecutionException, InterruptedException, IOException {
 		if (idUsuario == null || idUsuario.trim().isEmpty()) {
 			throw new NullParamsException("Es necesario un ID válido para eliminar al usuario.");
 		}
+
+		// Verificamos si el usuario existe antes de borrar su perfil
+		if (!usuarioRepository.existePorDni(idUsuario)) { // Si usas el DNI como ID
+			throw new NullParamsException("No se puede eliminar: el usuario no existe.");
+		}
+
 		usuarioRepository.eliminar(idUsuario);
 	}
 
-	/**
-	 * Actualiza la información de perfil de un usuario existente.
-	 * @param usuario Objeto con los datos actualizados e ID válido.
-	 * @throws NullParamsException Si el objeto o su ID son nulos o vacíos.
-	 * @throws ExecutionException Si la actualización falla en Firestore.
-	 * @throws InterruptedException Si se interrumpe la comunicación.
-	 * @throws IOException Si falla la escritura del log de incidencias.
-	 */
 	@Override
 	public void modificar(Usuario usuario) throws NullParamsException, ExecutionException, InterruptedException, IOException {
 		if (usuario == null || usuario.getIdUsuario() == null || usuario.getIdUsuario().trim().isEmpty()) {
 			throw new NullParamsException("Datos insuficientes para modificar el perfil de usuario (ID ausente).");
 		}
+
+		// Validamos existencia antes de modificar
+		if (!usuarioRepository.existePorDni(usuario.getIdUsuario())) {
+			throw new NullParamsException("No se puede modificar un usuario que no existe.");
+		}
+
 		usuarioRepository.modificar(usuario);
 	}
 	
-	/**
-	 * Gestiona el cambio de estado de la cuenta de usuario (ej: Activo, Bloqueado o Eliminado lógico).
-	 * Valida la identidad del usuario antes de proceder con el cambio en el repositorio.
-	 */
 	@Override
 	public void cambiarEstado(String idUsuario, ModeloBase.Estados estado) throws Exception {
+		if (idUsuario == null || idUsuario.trim().isEmpty()) {
+			throw new NullParamsException("Se necesita un ID válido para cambiar el estado del usuario.");
+		}
 
-	    if (idUsuario == null || idUsuario.trim().isEmpty()) {
-	        throw new NullParamsException("Se necesita un ID válido para cambiar el estado del usuario.");
-	    }
+		if (!usuarioRepository.existePorDni(idUsuario)) {
+			throw new NullParamsException("No se encontró el usuario para actualizar su estado.");
+		}
 
-	    usuarioRepository.cambiarEstado(idUsuario, estado);
+		usuarioRepository.cambiarEstado(idUsuario, estado);
 	}
 }

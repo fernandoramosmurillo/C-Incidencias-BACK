@@ -1,42 +1,37 @@
-/.metadata/
-/bin/
-/target/
+# --- IDEs y Editores ---
+.metadata/
 .settings/
 .project
 .classpath
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### STS ###
 .apt_generated
-.classpath
 .factorypath
-.project
-.settings
 .springBeans
 .sts4-cache
-
-### IntelliJ IDEA ###
 .idea
 *.iws
 *.iml
 *.ipr
-
-### NetBeans ###
+.vscode/
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
+
+# --- Build Tools (Maven/Gradle) ---
+target/
+bin/
 build/
+.mvn/wrapper/maven-wrapper.jar
+HELP.md
+
+# Excepciones para mantener carpetas de compilación específicas si fuera necesario
+!**/src/main/**/target/
+!**/src/test/**/target/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
-.vscode/
-/.metadata/
-
+# --- SEGURIDAD Y CONFIGURACIÓN LOCAL (Muy importante) ---
 src/main/resources/serviceAccountKey.json
+.env
+*.log

@@ -1,8 +1,13 @@
 package com.cIncidencias.api.controladores;
 
+import com.cIncidencias.api.modelos.AuthUsuario;
+import com.cIncidencias.api.modelos.FullUsuario;
 import com.cIncidencias.api.modelos.ModeloBase;
 import com.cIncidencias.api.modelos.Usuario;
+import com.cIncidencias.api.servicios.FirebaseAuthService;
 import com.cIncidencias.api.servicios.IGenericoService;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,16 +20,21 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/usuarios")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class UsuarioController {
 
 	private final IGenericoService<Usuario> usuarioService;
+	private final FirebaseAuthService authService;
+	
+	@Value("${app.security.public-key}")
+    private String miClaveMaestra;
 
 	/**
 	 * Inyectamos el servicio para gestionar toda la lógica de los usuarios.
 	 */
-	public UsuarioController(IGenericoService<Usuario> usuarioService) {
+	public UsuarioController(IGenericoService<Usuario> usuarioService, FirebaseAuthService authService) {
 		this.usuarioService = usuarioService;
+		this.authService = authService;
 	}
 
 	/**
@@ -32,8 +42,9 @@ public class UsuarioController {
 	 * GET /api/usuarios
 	 */
 	@GetMapping
-	public ResponseEntity<List<Usuario>> listar() {
+	public ResponseEntity<List<Usuario>> listar(@RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			List<Usuario> lista = usuarioService.obtenerTodos();
 			return new ResponseEntity<>(lista, HttpStatus.OK);
 		} catch (Exception e) {
@@ -47,8 +58,9 @@ public class UsuarioController {
 	 * GET /api/usuarios/{id}
 	 */
 	@GetMapping("/{id}")
-	public ResponseEntity<Usuario> obtenerPorId(@PathVariable("id") String id) {
+	public ResponseEntity<Usuario> obtenerPorId(@PathVariable("id") String id, @RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			Usuario usuario = usuarioService.obtenerPorId(id);
 			return (usuario != null) 
 					? new ResponseEntity<>(usuario, HttpStatus.OK) 
@@ -58,14 +70,62 @@ public class UsuarioController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	
+	/**
+	 * Busca los datos de un usuario concreto a través de su ID único.
+	 * GET /api/usuarios/{id}
+	 */
+	@GetMapping("/completo/{id}")
+	public ResponseEntity<FullUsuario> obtenerUsuarioCompletoPorId(@PathVariable("id") String id, @RequestHeader("Authorization") String token) {
+		try {
+			AuthUsuario authUsuario = authService.verificarToken(token);
+			
+			Usuario usuario = usuarioService.obtenerPorId(id);
+			
+			if (usuario == null) {
+				return ResponseEntity.notFound().build();
+			}
+			
+			FullUsuario usuarioCompleto = new FullUsuario(usuario, authUsuario);
+			
+			return ResponseEntity.ok(usuarioCompleto);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
+	@GetMapping("/publico")
+	public ResponseEntity<List<Usuario>> listarPublico(
+	        @RequestHeader(value = "X-App-Config", required = false) String secret
+	) {
+	    if (miClaveMaestra == null || !miClaveMaestra.equals(secret)) {
+	        // Si la clave no coincide o no se ha cargado la variable, 404.
+	        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+	    }
 
+	    try {
+	        List<Usuario> lista = usuarioService.obtenerTodos();
+	        return new ResponseEntity<>(lista, HttpStatus.OK);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
+	}
+	
+	
+	
 	/**
 	 * Da de alta a un nuevo usuario en el sistema.
 	 * POST /api/usuarios
 	 */
 	@PostMapping
-	public ResponseEntity<String> guardar(@RequestBody Usuario usuario) {
+	public ResponseEntity<String> guardar(@RequestBody Usuario usuario, @RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			usuarioService.guardar(usuario);
 			return new ResponseEntity<>("Usuario registrado con éxito", HttpStatus.CREATED);
 		} catch (Exception e) {
@@ -97,9 +157,10 @@ public class UsuarioController {
 	 * Actualiza la información (nombre, apellidos, etc.) de un perfil que ya existe.
 	 * PUT /api/usuarios
 	 */
-	@PutMapping
-	public ResponseEntity<String> modificar(@RequestBody Usuario usuario) {
+	@PutMapping("/{id}")
+	public ResponseEntity<String> modificar(@PathVariable("id") String id, @RequestBody Usuario usuario, @RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			usuarioService.modificar(usuario);
 			return new ResponseEntity<>("Perfil de usuario actualizado correctamente", HttpStatus.OK);
 		} catch (Exception e) {
@@ -113,8 +174,9 @@ public class UsuarioController {
 	 * DELETE /api/usuarios/{id}
 	 */
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> eliminar(@PathVariable("id") String id) {
+	public ResponseEntity<String> eliminar(@PathVariable("id") String id, @RequestHeader("Authorization") String token) {
 		try {
+			authService.verificarToken(token);
 			usuarioService.eliminar(id);
 			return new ResponseEntity<>("Usuario eliminado correctamente", HttpStatus.OK);
 		} catch (Exception e) {
@@ -128,8 +190,9 @@ public class UsuarioController {
 	 * Útil para bloqueos temporales o bajas lógicas.
 	 */
 	@PutMapping("/{id}/estado/{estado}")
-	public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable ModeloBase.Estados estado) {
+	public ResponseEntity<String> cambiarEstado(@PathVariable String id, @PathVariable ModeloBase.Estados estado, @RequestHeader("Authorization") String token) {
 	    try {
+			authService.verificarToken(token);
 	        usuarioService.cambiarEstado(id, estado);
 	        return new ResponseEntity<>("Estado del usuario actualizado a: " + estado, HttpStatus.OK);
 	    } catch (Exception e) {

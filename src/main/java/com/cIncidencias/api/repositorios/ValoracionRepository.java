@@ -144,4 +144,19 @@ public class ValoracionRepository implements IGenericoRepository<Valoracion> {
 	            false
 	    );
 	}
+	
+	/**
+	 * Verifica si una valoración ya existe en Firestore utilizando su identificador.
+	 * Mantiene la coherencia técnica y visual con el resto de repositorios.
+	 * @param idValoracion El identificador único de la valoración.
+	 * @return true si la valoración existe, false en caso contrario.
+	 */
+	public boolean existePorId(String idValoracion) throws InterruptedException, ExecutionException {
+	    DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idValoracion);
+	    
+	    ApiFuture<DocumentSnapshot> future = docRef.get();
+
+	    // Si el documento existe en la colección de valoraciones, retornamos true
+	    return future.get().exists();
+	}
 }

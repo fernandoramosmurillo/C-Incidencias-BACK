@@ -143,4 +143,19 @@ public class NotificacionRepository implements IGenericoRepository<Notificacion>
 	            false
 	    );
 	}
+	
+	/**
+	 * Verifica si una notificación ya existe en Firestore utilizando su ID.
+	 * Mantiene la coherencia técnica con los demás repositorios del sistema.
+	 * @param idNotificacion El identificador único de la notificación.
+	 * @return true si la notificación existe, false en caso contrario.
+	 */
+	public boolean existePorId(String idNotificacion) throws InterruptedException, ExecutionException {
+	    DocumentReference docRef = FIRESTORE.collection(COLECCION).document(idNotificacion);
+	    
+	    ApiFuture<DocumentSnapshot> query = docRef.get();
+
+	    // Si el documento existe en la colección de notificaciones, retornamos true
+	    return query.get().exists();
+	}
 }
